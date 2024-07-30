@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using MudRoles;
 using MudRoles.Client.Pages;
 using MudRoles.Components;
 using MudRoles.Components.Account;
@@ -39,6 +40,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
+builder.Services.AddDbContext<ApiKeyDbContext>(options =>
+           options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection")));
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -70,5 +73,21 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+// Seed the database with default roles and users 
+// Uncomment this code to seed the database with default roles and users
 
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    try
+//    {
+//        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+//        await SeedData.Initialize(services, userManager);
+//    }
+//    catch (Exception ex)
+//    {
+//        var logger = services.GetRequiredService<ILogger<Program>>();
+//        logger.LogError(ex, "An error occurred while seeding the database.");
+//    }
+//}
 app.Run();
