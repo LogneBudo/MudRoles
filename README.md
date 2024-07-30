@@ -19,16 +19,16 @@ MudRoles is a sample project demonstrating the use of Blazor with Identity and r
 ### Installation
 1. **Clone the repository**:
 
-git clone https://github.com/LogneBudo/MudRoles.git
-cd MudRoles
+```git clone https://github.com/LogneBudo/MudRoles.git
+cd MudRoles```
 
 2. **Restore NuGet packages**:
 
-```dotnet restore
+```dotnet restore```
 
 3. **Update the database**:
 
-```dotnet ef database update
+```dotnet ef database update```
 
 ### Configuration
 1. **AppSettings**: Ensure your `appsettings.json` is configured correctly for your database and authentication settings.
@@ -36,7 +36,7 @@ cd MudRoles
 ### Running the Application
 1. **Run the application**:
 
-```dotnet run
+```dotnet run```
 
 
 2. **Open in browser**: Navigate to `https://localhost:5001` to see the application in action.
