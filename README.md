@@ -18,9 +18,9 @@ MudRoles is a sample project demonstrating the use of Blazor with Identity and r
 
 ### Installation
 1. **Clone the repository**:
-
-<code>git clone https://github.com/LogneBudo/MudRoles.git
-cd MudRoles</code>
+##
+<tab><tab>git clone https://github.com/LogneBudo/MudRoles.git
+cd MudRoles
 
 2. **Restore NuGet packages**:
 
