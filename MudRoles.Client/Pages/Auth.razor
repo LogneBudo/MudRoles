@@ -1,0 +1,25 @@
+﻿@page "/auth"
+
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient HttpClient
+@attribute [Authorize]
+
+<PageTitle>Auth</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">You are authenticated</MudText>
+
+<AuthorizeView>
+    <MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
+</AuthorizeView>
+
+@code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        var gibberishResponse = await HttpClient.GetFromJsonAsync<GibberishModel>("api/apikeys");
+    }
+    public class GibberishModel
+    {
+        public string Message { get; set; }
+    }
+}
