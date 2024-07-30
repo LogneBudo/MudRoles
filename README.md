@@ -24,7 +24,7 @@ cd MudRoles```
 
 2. **Restore NuGet packages**:
 
-```dotnet restore```
+	<code>dotnet restore</code>
 
 3. **Update the database**:
 
