@@ -9,6 +9,7 @@ using MudRoles.Components.Account;
 using MudRoles.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
@@ -38,6 +39,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddRoleManager<RoleManager<IdentityRole>>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 builder.Services.AddDbContext<ApiKeyDbContext>(options =>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -73,7 +74,14 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
     {
         authenticationStateTask = task;
     }
-
+    /// <summary>
+    /// Invoked when the state is being persisted.
+    /// This method ensures that the authentication state, including user roles, is persisted to the client.
+    /// It retrieves the user ID, email, and roles from the claims and stores them in the PersistentComponentState.
+    /// This is crucial for roles to be available in the client and for the server to check roles.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="UnreachableException">Thrown if the authentication state is not set.</exception>
     private async Task OnPersistingAsync()
     {
         if (authenticationStateTask is null)
@@ -83,21 +91,29 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
 
         var authenticationState = await authenticationStateTask;
         var principal = authenticationState.User;
-
+        //This needs to be configured for roles to be persisted in claims and available in the client and for the server to check roles
         if (principal.Identity?.IsAuthenticated == true)
         {
+            // Retrieve the user ID from the claims
             var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
+            // Retrieve the email from the claims
             var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
+            // Retrieve all roles from the claims
+            var roles = principal.FindAll(options.ClaimsIdentity.RoleClaimType).Select(claim => claim.Value).ToList();
 
+            // Ensure userId and email are not null before persisting the state
             if (userId != null && email != null)
             {
+                // Persist the user information including roles to the state
                 state.PersistAsJson(nameof(UserInfo), new UserInfo
                 {
                     UserId = userId,
                     Email = email,
+                    Roles = roles
                 });
             }
         }
+
     }
 
     protected override void Dispose(bool disposing)
