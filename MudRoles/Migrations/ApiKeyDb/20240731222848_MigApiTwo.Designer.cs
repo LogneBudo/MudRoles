@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MudRoles.Data;
 
@@ -10,9 +11,11 @@ using MudRoles.Data;
 namespace MudRoles.Migrations.ApiKeyDb
 {
     [DbContext(typeof(ApiKeyDbContext))]
-    partial class ApiKeyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240731222848_MigApiTwo")]
+    partial class MigApiTwo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");

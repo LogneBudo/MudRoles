@@ -12,52 +12,84 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @inject UserManager<ApplicationUser> UserManager
-<PageTitle>Log in</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Log in</MudText>
+<PageTitle>Login to CodeMoa</PageTitle>
 
-<MudGrid>
-    <MudItem md="6">
-        <StatusMessage Message="@errorMessage" />
-        <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-            <DataAnnotationsValidator />
-
-            <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
-
-            <MudGrid>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
-                                        Label="Email" Placeholder="name@example.com"
-                                        UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+<MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
+    <MudGrid Spacing="0">
+        <MudItem Class="rounded-l-xl d-flex flex-column object-contain align-center justify-center" lg="6" md="6" Style="background: url('Register-Background.png') no-repeat center center / cover;box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);">
+            <MudText Color="Color.Primary" Typo="Typo.h3">CodeMoa</MudText>
+            <MudText Color="Color.Secondary" Typo="Typo.h3">Infrastructure</MudText>
+        </MudItem>
+        <MudItem lg="6" md="6">
+            <MudPaper Elevation="3" Class="pa-8 rounded-r-xl">
+                <StatusMessage Message="@errorMessage" />
+                <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+                    <MudGrid>
+                        <DataAnnotationsValidator />
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudIcon Icon="@CustomIcons.LogoDark" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500" Style="width: 100px; height: 100px;" />
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText Typo="Typo.h4">Sign-in</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText>
+                                    Login with your Credentials.
+                                </MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudStaticTextField Typo="Typo.h6" For="@(() => Input.Email)" @bind-Value="Input.Email"
+                                                Label="Email" Placeholder="name@example.com"
+                                                UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudStaticTextField Typo="Typo.h6" For="@(() => Input.Password)" @bind-Value="Input.Password"
+                                                Label="Password" InputType="InputType.Password" Placeholder="password"
+                                                UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudStaticCheckBox Color="Color.Primary" For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudStaticButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth="false" FormAction="FormAction.Submit">Log in</MudStaticButton>
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+                <MudGrid Class="mt-4">
+                    <MudItem xs="12">
+                        <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink><br />
+                        <MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</MudLink><br />
+                        <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink>
+                    </MudItem>
+                </MudGrid>
+                <MudItem xs="12">
+                    &nbsp;
                 </MudItem>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="Password" InputType="InputType.Password" Placeholder="password"
-                                        UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
+                <MudItem xs="12">
+                    &nbsp;
                 </MudItem>
-                <MudItem md="12">
-                    <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
+                <MudItem xs="12">
+                    <MudAlert Class="d-flex justify-flex-end" Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Right">
+                        Use another service to log in.
+                        <ExternalLoginPicker />
+                    </MudAlert>
                 </MudItem>
-                <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Log in</MudStaticButton>
-                </MudItem>
-            </MudGrid>
-        </EditForm>
-
-        <MudGrid Class="mt-4">
-            <MudItem md="12">
-                <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink><br />
-                <MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</MudLink><br />
-                <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink>
-            </MudItem>
-        </MudGrid>
-    </MudItem>
-    <MudItem md="6">
-        <MudText GutterBottom="true" Typo="Typo.body1">Use another service to log in.</MudText>
-
-        <ExternalLoginPicker />
-    </MudItem>
-</MudGrid>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
 

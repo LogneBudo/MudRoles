@@ -17,43 +17,106 @@
 
 <PageTitle>Register</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Register</MudText>
+<MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
+    <MudGrid Spacing="0">
+        <MudItem Class="rounded-l-xl d-flex flex-column object-contain align-center justify-center" xl="6" xxl="6" lg="6" md="0" sm="0" xs="0" Style="background: url('Register-Background.png') no-repeat center center / cover;">
+            <MudText Color="Color.Primary" Typo="Typo.h3">CodeMoa</MudText>
+            <MudText Color="Color.Secondary" Typo="Typo.h3">Registration</MudText>
+        </MudItem>
+        <MudItem lg="6" md="12" sm="12" xs="12">
+            <MudPaper Elevation="0" Class="pa-8 rounded-r-xl">
+                <StatusMessage Message="@Message" />
+                <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+                    <DataAnnotationsValidator />
+                    <MudItem md="12" sm="12" xs="12">
+                        <div class="d-flex justify-center">
+                            <MudIcon Icon="@CustomIcons.LogoDark" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500" Style="width: 100px; height: 100px;" />
+                        </div>
+                    </MudItem>
+                    <DataAnnotationsValidator />
+                    <MudItem md="12" sm="12" xs="12">
+                        <div class="d-flex justify-center">
+                            <MudText Typo="Typo.h4">Register</MudText>
+                        </div>
+                    </MudItem>
+                    <MudItem md="12" sm="12" xs="12">
+                        <div class="d-flex justify-center">
+                            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
+                        </div>
+                    </MudItem>
+                    <MudGrid>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticTextField For="@(() => Input.FirstName)" @bind-Value="Input.FirstName"
+                                                Label="First name" Placeholder="Paul"
+                                                UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticTextField For="@(() => Input.LastName)" @bind-Value="Input.LastName"
+                                                Label="Last name" Placeholder="Simon"
+                                                UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudSelect T="string" Label="Title" @bind-Value="Input.Title">
+                                <MudSelectItem Value="@Titles.Mr.ToString()">Mr</MudSelectItem>
+                                <MudSelectItem Value="@Titles.Mrs.ToString()">Mrs</MudSelectItem>
+                                <MudSelectItem Value="@Titles.Miss.ToString()">Miss</MudSelectItem>
+                                <MudSelectItem Value="@Titles.Lord.ToString()">Lord</MudSelectItem>
+                                <MudSelectItem Value="@Titles.Dr.ToString()">Dr</MudSelectItem>
+                                <MudSelectItem Value="@Titles.Prof.ToString()">Prof</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticSwitch For="@(() => Input.IsDarkTheme)" @bind-Checked="Input.IsDarkTheme"
+                                             Label="Dark Theme" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudButton OnClick="OpenAvatarPicker">Choose Avatar</MudButton>
+                            <MudPopover Open="@isAvatarPickerOpen" CloseOnOutsideClick="true" OnClose="CloseAvatarPicker">
+                                <MudPaper Class="pa-4">
+                                    <MudGrid>
+                                        @foreach (var avatar in avatars)
 
-<MudGrid>
-    <MudItem md="6">
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
-
-            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
-
-            <MudGrid>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
-                                        Label="Email" Placeholder="name@example.com"
-                                        UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="Password" InputType="InputType.Password" Placeholder="password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
-                                        Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
-                </MudItem>
-            </MudGrid>
-        </EditForm>
-    </MudItem>
-    <MudItem md="6">
-        <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
-        <ExternalLoginPicker />
-    </MudItem>
-</MudGrid>
+                                        {
+                                            <MudItem xs="4">
+                                                <MudAvatar Image="@avatar" Size="Size.Large" OnClick="() => SelectAvatar(avatar)" />
+                                            </MudItem>
+                                        }
+                                    </MudGrid>
+                                </MudPaper>
+                            </MudPopover>
+                            @if (!string.IsNullOrEmpty(Input.AvatarId))
+                            {
+                                <MudAvatar Image="@Input.AvatarId" Size="Size.Small" />
+                            }
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
+                                                Label="Email" Placeholder="name@example.com"
+                                                UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
+                                                Label="Password" InputType="InputType.Password" Placeholder="password"
+                                                UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
+                                                Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
+                                                UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudStaticButton DropShadow="true" Size="Size.Large" Variant="Variant.Filled" Color="Color.Primary" FullWidth="false" FormAction="FormAction.Submit">Register</MudStaticButton>
+                        </MudItem>
+                        <MudItem md="12" sm="12" xs="12">
+                            <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
+                            <ExternalLoginPicker />
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
@@ -65,6 +128,43 @@
     private string? ReturnUrl { get; set; }
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    private bool isAvatarPickerOpen;
+
+    private readonly List<string> avatars = new()
+    {
+        "avatar1.png",
+        "avatar2.png",
+        "avatar3.png",
+        "avatar4.png",
+        "avatar5.png"
+    };
+
+    private void OpenAvatarPicker()
+    {
+        isAvatarPickerOpen = true;
+    }
+
+    private void CloseAvatarPicker()
+    {
+        isAvatarPickerOpen = false;
+    }
+
+    private void SelectAvatar(string avatar)
+    {
+        Input.AvatarId = avatar;
+        CloseAvatarPicker();
+    }
+
+    private enum Titles
+    {
+        Mr,
+        Mrs,
+        Miss,
+        Lord,
+        Dr,
+        Prof
+    }
 
     public async Task RegisterUser(EditContext editContext)
     {
@@ -145,5 +245,22 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; } = "";
+
+        [Display(Name = "Title")]
+        public string Title { get; set; } = "";
+
+        [Display(Name = "Theme Preference")]
+        public bool IsDarkTheme { get; set; } = false;
+
+        [Display(Name = "Avatar")]
+        public string AvatarId { get; set; } = "";
     }
 }

@@ -1,22 +1,30 @@
 ﻿@inherits LayoutComponentBase
+@inject ThemeService ThemeService
 
-<MudThemeProvider />
+<MudThemeProvider IsDarkMode="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme)" Theme="@ThemeService.CurrentTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudText Typo="Typo.h5" Class="ml-3">CodeMoa</MudText>
+        <MudToolBar>
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
+        </MudToolBar>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
+            <MudTooltip Text="Toggle Dark Mode">
+                <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@((e) => ThemeService.ToggleDarkMode())" />
+            </MudTooltip>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true"></MudHidden>
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent Class="mt-16 pa-4">
-        @Body
-    </MudMainContent>
+    <MainBodyLayout OnDarkModeToggle="@DarkMode">
+        <CascadingValue Value="IsDarkMode">
+            @Body
+        </CascadingValue>
+    </MainBodyLayout>
 </MudLayout>
 
 
@@ -28,12 +36,22 @@
 
 @code {
     private bool _drawerOpen = true;
+    private bool IsDarkMode { get; set; } = false;
+    private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
+
+    private void DarkMode()
+    {
+        _currentTheme = IsDarkMode
+            ? MudRolesTheme.DefaultTheme
+            : MudRolesTheme.DarkTheme;
+
+        StateHasChanged();
+    }
 
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-
 }
 
 

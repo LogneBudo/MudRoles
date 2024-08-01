@@ -34,11 +34,11 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         }
 
         List<Claim> claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
-        new Claim(ClaimTypes.Name, userInfo.Email),
-        new Claim(ClaimTypes.Email, userInfo.Email)
-    };
+        {
+            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
+            new Claim(ClaimTypes.Name, userInfo.Email),
+            new Claim(ClaimTypes.Email, userInfo.Email)
+        };
         // Add the role claims
         foreach (var role in userInfo.Roles)
         {

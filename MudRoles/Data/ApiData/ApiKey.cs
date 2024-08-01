@@ -18,7 +18,7 @@ namespace MudRoles.Data.ApiData
         public DateTime CreationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         [Required]
-        public ApplicationUser Owner { get; set; }
+        public string UserId { get; set; }
 
         public KeyStatus Status { get; set; }
     }

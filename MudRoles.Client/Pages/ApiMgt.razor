@@ -3,47 +3,114 @@
 @attribute [Authorize]
 <PageTitle>Api Management</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">API Management</MudText>
+<MudText Typo="Typo.h3" GutterBottom="true">API Keys Management</MudText>
+<MudText Typo="Typo.body1" GutterBottom="true">These API Keys should only be used when developping and testing your application</MudText>
 
-<AuthorizeView>
-    <MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
-</AuthorizeView>
-
-<MudButton @onclick="DoSomething">Get API Keys</MudButton>
-
+<MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
+         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    <MudTabPanel Text="Create Key">
+        <MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
+        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
+            <Columns>
+                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" />
+                <TemplateColumn Title="Key">
+                    <CellTemplate Context="cellContext">
+                        @if (cellContext.Item.Key != null)
+                        {
+                            <MudFab Class="key-button" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 8)}")" />
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.CreationDate" Title="Created" />
+                <PropertyColumn Property="x => x.ExpirationDate" Title="Expires" />
+                <PropertyColumn Property="x => x.KeyPrefix" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <NoRecordsContent>
+                <MudText>No keys available</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <br />
+        <br />
+        <br />
+        <MudText Typo="Typo.h5" GutterBottom="true">Recently Expired</MudText>
+        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
+            <Columns>
+                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" />
+                <PropertyColumn Property="x => x.Key" />
+                <PropertyColumn Property="x => x.CreationDate" Title="Created" />
+                <PropertyColumn Property="x => x.ExpirationDate" Title="Expires" />
+                <PropertyColumn Property="x => x.KeyPrefix" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <NoRecordsContent>
+                <MudText>No keys available</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+    </MudTabPanel>
+    <MudTabPanel Text="Store">
+        <MudText>Content Store</MudText>
+    </MudTabPanel>
+    <MudTabPanel Text="Users">
+        <MudText>Content Users</MudText>
+    </MudTabPanel>
+</MudTabs>
+<br />
+<MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="PostGenerateAsync">Generate API Keys</MudButton>
+<style>
+    .mud-table-head {
+        font-weight: 500;
+    }
+        /* Change this to your desired font weight */
+</style>
 @code {
     private List<ApiKey> userApiKeys = new();
-
     private string authMessage = "The user is NOT authenticated.";
+    private string errorMessage = string.Empty;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
-
-    private async Task DoSomething()
+    protected override async Task OnInitializedAsync()
     {
-        if (authenticationState is not null)
+        await LoadApiKeys();
+    }
+    private async Task PostGenerateAsync()
+    {
+        var response = await HttpClient.PostAsync("api/apikeys", null);
+        if (response.IsSuccessStatusCode)
         {
-            var authState = await authenticationState;
-            var user = authState?.User;
-
-            if (user is not null)
-            {
-                if (user.Identity is not null && user.Identity.IsAuthenticated)
-                {
-                    // ...
-                }
-
-                if (user.IsInRole("Admin"))
-                {
-                    // ...
-                }
-
-            }
+            await LoadApiKeys(); // Reload the keys after generating a new one
+        }
+        else
+        {
+            errorMessage = "Failed to generate API key.";
         }
     }
     
     private async Task LoadApiKeys()
     {
-        var KeysResponse = await HttpClient.GetFromJsonAsync<List<ApiKey>>("api/apikeys");
+        try
+        {
+            var response = await HttpClient.GetFromJsonAsync<List<ApiKey>>("api/apikeys");
+            userApiKeys = response ?? new List<ApiKey>(); // Handle null response
+            errorMessage = string.Empty; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading API keys: {ex.Message}";
+        }
+        StateHasChanged();
     }
 }

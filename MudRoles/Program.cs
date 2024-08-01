@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Extensions;
 using MudBlazor.Services;
 using MudRoles;
+using MudRoles.Client.Infrastructure.Settings;
 using MudRoles.Client.Pages;
 using MudRoles.Components;
 using MudRoles.Components.Account;
@@ -12,8 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
 
 // Add MudBlazor services
-builder.Services.AddMudServices();
-
+builder.Services.AddMudServicesWithExtensions(); 
+builder.Services.AddScoped<ThemeService>();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -72,7 +74,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(MudRoles.Client._Imports).Assembly);
-
+app.UseMudExtensions();
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 // Seed the database with default roles and users 

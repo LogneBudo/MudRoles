@@ -28,19 +28,23 @@ namespace MudRoles
             }
 
             // Create demo users
-            await CreateDemoUser(userManager, "admin@example.com", "Admin123!", "Admin");
-            await CreateDemoUser(userManager, "user@example.com", "User123!", "User");
+            await CreateDemoUser(userManager, "admin@example.com", "Admin123!", "Admin","rudeboyitis","Sugam","Singh",true,"Mr.");
+            await CreateDemoUser(userManager, "user@example.com", "User123!", "User","randomuser","John","Doe",false,"Dr");
         }
 
-        private static async Task CreateDemoUser(UserManager<ApplicationUser> userManager, string email, string password, string role)
+        private static async Task CreateDemoUser(UserManager<ApplicationUser> userManager, string email, string password, string role, string username, string firstname, string lastname, bool isdark, string title)
         {
             if (userManager.Users.All(u => u.Email != email))
             {
                 var user = new ApplicationUser
                 {
-                    UserName = email,
+                    UserName = username,
                     Email = email,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FirstName = firstname,
+                    LastName = lastname,
+                    IsDarkTheme = isdark,
+                    Title = title
                 };
 
                 var result = await userManager.CreateAsync(user, password);

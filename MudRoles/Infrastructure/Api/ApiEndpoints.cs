@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using MudRoles.Data.ApiData;
 
-namespace MudRoles
+namespace MudRoles.Infrastructure.Api
 {
     public class ApiEndpoints
     {
