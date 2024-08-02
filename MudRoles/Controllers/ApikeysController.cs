@@ -67,7 +67,7 @@ namespace MudRoles.Controllers
                 ExpirationDate = DateTime.UtcNow.AddYears(1), // Example: 1 year expiration
                 UserId = user.Id, // Assuming the owner is the current user
                 Status = KeyStatus.Active,
-                Scopes = new List<Scope> { new Scope {  ScopeName = "GET", EndPoint = "/api/apikeys" }, new Scope { ScopeName = "Post", EndPoint = "/api/apikeys" } }
+                Scopes = new List<Scope> { new Scope {  ScopeVerb = "GET", EndPoint = "/api/apikeys" }, new Scope { ScopeVerb = "Post", EndPoint = "/api/apikeys" } }
             };
             _context.ApiKeys.Add(apiKey);
             await _context.SaveChangesAsync();

@@ -1,13 +1,15 @@
 ﻿@inherits LayoutComponentBase
 @layout MudRoles.Client.Layout.MainLayout
 @inject NavigationManager NavigationManager
-
+<MudPopoverProvider @rendermode="RenderMode.InteractiveWebAssembly" />
 @if (HttpContext is null)
 {
+    
     <p>Loading...</p>
 }
 else
 {
+    
     @Body
 }
 

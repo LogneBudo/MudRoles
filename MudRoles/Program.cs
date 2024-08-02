@@ -14,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
 
 // Add MudBlazor services
-builder.Services.AddMudServicesWithExtensions(); 
+builder.Services.AddMudServicesWithExtensions(options =>
+{
+    options.PopoverOptions.ThrowOnDuplicateProvider = false;
+});
 builder.Services.AddScoped<ThemeService>();
 // Add services to the container.
 builder.Services.AddRazorComponents()

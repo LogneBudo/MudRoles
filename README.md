@@ -1,5 +1,7 @@
 # MudRoles
 
+![Static Badge](https://img.shields.io/badge/.Net%208-MudBlazor-brightgreen?style=for-the-badge)   ![GitHub License](https://img.shields.io/github/license/https%3A%2F%2Fgithub.com%2FLogneBudo/https%3A%2F%2Fgithub.com%2FLogneBudo%2FMudRoles?logo=codemoa)
+
 ## Overview
 MudRoles is a sample project demonstrating the use of Blazor with Identity and roles, integrated with MudBlazor for UI components. This project includes a Web API protected by role-based authorization and showcases how to filter data based on user roles.
 

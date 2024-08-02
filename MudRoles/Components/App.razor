@@ -8,14 +8,28 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />  
     <link rel="icon" type="image/ico" href="favicon.ico" />
+    <script type="importmap">
+        {
+          "imports": {
+            "@@material/web/": "https://esm.run/@@material/web/"
+          }
+        }
+    </script>
+    <script type="module">
+        import '@@material/web/all.js';
+        import {styles as typescaleStyles} from '@@material/web/typography/md-typescale-styles.js';
+
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
     <HeadOutlet @rendermode="RenderModeForPage" />
 </head>
 
 <body>
+
     <Routes @rendermode="RenderModeForPage" />
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    
+
 </body>
 
 </html>

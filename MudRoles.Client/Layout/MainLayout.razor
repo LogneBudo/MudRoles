@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject ThemeService ThemeService
-
 <MudThemeProvider IsDarkMode="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme)" Theme="@ThemeService.CurrentTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
