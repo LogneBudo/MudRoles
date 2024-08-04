@@ -361,3 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignore database files
+MudRoles/Data/apikeys.db-shm
+MudRoles/Data/apikeys.db-wal
+MudRoles/Data/apikeys.db
+
+# Ignore other files and directories
+*.log
+bin/
+obj/
