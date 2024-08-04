@@ -1,0 +1,85 @@
+﻿@using MudBlazor
+@using static MudRoles.Client.Pages.ApiMgt
+<MudDialog Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface py-10" ActionsClass="dialog-background-surface">
+    <DialogContent>
+        <MudTextField @bind-Value="apiKeyName" Label="API Key Name" Required="true" />
+        <br />
+        @if (Scopes != null)
+        {
+            @foreach (var scope in Scopes)
+            {
+                <MudSwitch @bind-Value="scope.IsChecked" ThumbIcon="@(scope.IsChecked == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(scope.IsChecked == true ? Color.Success : Color.Error)">
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Api" IconColor="Color.Success">@scope.Controller</MudChip>
+                    <MudBadge Icon="@Icons.Material.Filled.Lock" Color="Color.Error" Overlap="true" Bordered="true" Class="mx-6 my-4">
+                        <MudButton Color="@(@scope.Verb == "GET" ? Color.Success : Color.Warning)" Variant="Variant.Filled" DropShadow="false">@scope.Verb</MudButton>
+                    </MudBadge>
+                    <MudBadge Origin="Origin.TopLeft" Icon="@Icons.Material.Filled.OpenInBrowser" Color="Color.Success" Overlap="true" Bordered="true" Class="mx-6 my-4">
+                        <MudButton Color="Color.Surface" Variant="Variant.Filled" DropShadow="false"><MudText>@(scope.Endpoint?.ToLower())</MudText></MudButton>
+                    </MudBadge>
+                </MudSwitch>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Disabled="@_processing" OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Generating</MudText>
+            }
+            else
+            {
+                <MudText>Click me</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+<style>
+    .blur {
+        backdrop-filter: blur(10px);
+    }
+
+    .dialog-background {
+        background-color: transparent;
+    }
+
+    .dialog-background-title {
+        background: rgb(from var(--mud-palette-primary) r g b / 50%);
+        color: var(--mud-palette-white);
+    }
+
+    .dialog-background-surface {
+        background: rgb(from var(--mud-palette-surface) r g b / 75%);
+    }
+</style>
+@code {
+    private bool _processing = false;
+
+    async Task ProcessSomething()
+    {
+        _processing = true;
+        await Task.Delay(2000);
+        _processing = false;
+    }
+
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+    private string? apiKeyName;
+    private List<Scope>? selectedScopes;
+    [Parameter]
+    public List<Scope>? Scopes { get; set; }
+
+    private async void Submit() 
+    {
+        _processing = true;
+        await Task.Delay(2000);
+        _processing = false;
+        MudDialog?.Close(DialogResult.Ok(apiKeyName)); 
+    }
+
+    private void Cancel() => MudDialog?.Cancel();
+
+}

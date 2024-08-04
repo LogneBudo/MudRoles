@@ -2,8 +2,10 @@
 {
     public class Scope
     {
-        public int Id { get; set; }
-        public string? ScopeVerb { get; set; }
-        public string? EndPoint { get; set; }
+        public string? Controller { get; set; }
+        public string? Method { get; set; }
+        public string? Verb { get; set; }
+        public string? Endpoint { get; set; }
     }
+
 }

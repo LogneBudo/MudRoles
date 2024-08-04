@@ -108,10 +108,10 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    private string selectedTitle;
+    private string? selectedTitle;
 
     [Parameter]
-    public string Value
+    public string? Value
     {
         get;
         set;
@@ -128,7 +128,7 @@
 
     private void HandleSelectChange(ChangeEventArgs e)
     {
-        selectedTitle = e.Value.ToString();
+        selectedTitle = e.Value?.ToString() ?? string.Empty;
         Input.Title = selectedTitle;
     }
 

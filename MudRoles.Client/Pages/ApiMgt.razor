@@ -1,5 +1,7 @@
 ﻿@page "/apikeys"
+@using MudRoles.Client.Models
 @inject HttpClient HttpClient
+@inject IDialogService DialogService
 @attribute [Authorize]
 <PageTitle>Api Management</PageTitle>
 
@@ -68,7 +70,7 @@
     </MudTabPanel>
 </MudTabs>
 <br />
-<MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="PostGenerateAsync">Generate API Keys</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="@(() => PostGenerateAsync(scopes))">Generate API Keys</MudButton>
 <style>
     .mud-table-head {
         font-weight: 500;
@@ -77,17 +79,30 @@
 </style>
 @code {
     private List<ApiKey> userApiKeys = new();
-    private string authMessage = "The user is NOT authenticated.";
     private string errorMessage = string.Empty;
-
+    private List<Scope> scopes = new();
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        await LoadScopes();
         await LoadApiKeys();
     }
-    private async Task PostGenerateAsync()
+
+    private async Task PostGenerateAsync(List<Scope> scopes)
     {
+        var parameters = new DialogParameters<ApiKeyDialog> { { x => x.Scopes, scopes } };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<ApiKeyDialog>("API Key Generator", parameters, options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            var name = result.Data;
+
+        }
+
         var response = await HttpClient.PostAsync("api/apikeys", null);
         if (response.IsSuccessStatusCode)
         {
@@ -98,7 +113,26 @@
             errorMessage = "Failed to generate API key.";
         }
     }
-    
+    public sealed class Scope
+    {
+        public string Controller { get; set; }
+        public string Verb { get; set; }
+        public string? Endpoint { get; set; }
+        public bool IsChecked { get; set; }
+    }
+    private async Task LoadScopes()
+    {
+        try
+        {
+            var response = await HttpClient.GetFromJsonAsync<List<Scope>>("api/apikeys/scopes");
+            scopes = response ?? new List<Scope>(); // Handle null response
+            errorMessage = string.Empty; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading scopes: {ex.Message}";
+        }
+    }
     private async Task LoadApiKeys()
     {
         try
@@ -112,5 +146,17 @@
             errorMessage = $"Error loading API keys: {ex.Message}";
         }
         StateHasChanged();
+    }
+    internal class ApiKey
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? KeyPrefix { get; set; }
+        public string? Key { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public string? UserId { get; set; }
     }
 }

@@ -42,6 +42,10 @@ namespace MudRoles.Migrations.ApiKeyDb
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ScopesJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -52,40 +56,6 @@ namespace MudRoles.Migrations.ApiKeyDb
                     b.HasKey("Id");
 
                     b.ToTable("ApiKeys");
-                });
-
-            modelBuilder.Entity("MudRoles.Data.ApiData.Scope", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ApiKeyId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EndPoint")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ScopeVerb")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApiKeyId");
-
-                    b.ToTable("Scope");
-                });
-
-            modelBuilder.Entity("MudRoles.Data.ApiData.Scope", b =>
-                {
-                    b.HasOne("MudRoles.Data.ApiData.ApiKey", null)
-                        .WithMany("Scopes")
-                        .HasForeignKey("ApiKeyId");
-                });
-
-            modelBuilder.Entity("MudRoles.Data.ApiData.ApiKey", b =>
-                {
-                    b.Navigation("Scopes");
                 });
 #pragma warning restore 612, 618
         }

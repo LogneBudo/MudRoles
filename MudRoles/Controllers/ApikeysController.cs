@@ -5,6 +5,7 @@ using MudRoles.Data.ApiData;
 using System.Security.Claims;
 using MudRoles.Data;
 using MudRoles.Infrastructure.Api;
+using ApiKey = MudRoles.Data.ApiData.ApiKey;
 
 namespace MudRoles.Controllers
 {
@@ -23,7 +24,15 @@ namespace MudRoles.Controllers
             var apiKeys = await _context.ApiKeys.ToListAsync();
             return Ok(apiKeys);
         }
-
+        // GET: api/Scopes
+        [HttpGet("Scopes")]
+        [Authorize(Roles = "Admin,User")] // Both Admin and User roles can access this endpoint
+        public async Task<ActionResult<IEnumerable<Scope>>> GetScopes()
+        {
+            var scocpes = ScopeFetcher.GetAllRoutes();
+            await Task.Yield();
+            return Ok(scocpes);
+        }
         // GET: api/ApiKeys/5
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,User")] // Both Admin and User roles can access this endpoint
@@ -60,14 +69,14 @@ namespace MudRoles.Controllers
             }
             var apiKey = new ApiKey
             {
-                Name = user.UserName, // Default name
+                Name = user.UserName ?? "DefaultName", // Default name
                 KeyPrefix = "API-KEY",
                 Key = ApiKeyGenerator.GenerateApiKey(),
                 CreationDate = DateTime.UtcNow,
                 ExpirationDate = DateTime.UtcNow.AddYears(1), // Example: 1 year expiration
                 UserId = user.Id, // Assuming the owner is the current user
                 Status = KeyStatus.Active,
-                Scopes = new List<Scope> { new Scope {  ScopeVerb = "GET", EndPoint = "/api/apikeys" }, new Scope { ScopeVerb = "Post", EndPoint = "/api/apikeys" } }
+                //Scopes = new List<Scope> { new Scope {  ScopeVerb = "GET", EndPoint = "/api/apikeys" }, new Scope { ScopeVerb = "Post", EndPoint = "/api/apikeys" } }
             };
             _context.ApiKeys.Add(apiKey);
             await _context.SaveChangesAsync();

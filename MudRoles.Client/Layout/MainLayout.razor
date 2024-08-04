@@ -35,15 +35,12 @@
 
 @code {
     private bool _drawerOpen = true;
-    private bool IsDarkMode { get; set; } = false;
+    private bool IsDarkMode { get; set; }
     private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
 
     private void DarkMode()
     {
-        _currentTheme = IsDarkMode
-            ? MudRolesTheme.DefaultTheme
-            : MudRolesTheme.DarkTheme;
-
+        ThemeService.ToggleDarkMode();
         StateHasChanged();
     }
 

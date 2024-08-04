@@ -9,7 +9,11 @@ namespace MudRoles.Data
             : base(options)
         {
         }
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ApiKey>().Ignore(e => e.Scopes);
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<ApiKey> ApiKeys { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
