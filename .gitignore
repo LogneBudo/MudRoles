@@ -371,3 +371,7 @@ MudRoles/Data/apikeys.db
 *.log
 bin/
 obj/
+/MudRoles/Data/app.db-shm
+/MudRoles/Data/app.db-wal
+/MudRoles/Data/apikeys.db
+/MudRoles/Data/app.db
