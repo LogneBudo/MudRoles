@@ -13,6 +13,10 @@
         background: #2d2b57; /* Set your desired background color */
         padding: 0.5em;
     }
+
+    .hljs-comment {
+        color: green; /* Set your desired green color */
+    }
 </style>
 
 @code {
@@ -26,7 +30,10 @@
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("highlightSnippet");
+            if (!string.IsNullOrEmpty(Language))
+            {
+                await JS.InvokeVoidAsync("highlightSnippet");
+            }
         }
     }
 }

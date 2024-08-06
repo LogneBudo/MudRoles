@@ -3,15 +3,142 @@
 
 <MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
     <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
-        <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-            <MudText Typo="Typo.h1">Blazor Identity with Roles</MudText>
+        <MudPaper Elevation="0" Class="d-flex flex-column flex-wrap gap-4 align-center justify-center">
+            <MudIconButton Class="flex-auto" Icon="@Icons.Material.Filled.Security" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Class="flex-auto" Typo="Typo.h1">Blazor Identity with Roles</MudText>
+            <MudText Class="flex-auto" Typo="Typo.h3">Configuring Blazor</MudText>
         </MudPaper>
     </MudSection>
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="1">
-
+    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="2">
+        <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                        <MudText Class="flex-auto" Typo="Typo.h4">Step 1: Add Roles</MudText>
+                        
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                        <MudText Class="flex-auto" Typo="Typo.h4">Step 2: Add Claims</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
+                        <MudText Class="flex-auto" Typo="Typo.h4">Step 3: Fix Persistence Revalitation</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
+                        <MudText Class="flex-auto" Typo="Typo.body2">
+                            <h5>Server side program.cs file</h5>
+                            <br />
+                            <CodeBlock Language="csharp">
+                                @programSnippet
+                            </CodeBlock>
+                            <br />
+                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-8.0#add-role-services-to-identity" Target="_blank">Microsoft Blazor docs on adding Roles</MudLink>
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
+                        <MudText Class="flex-auto" Typo="Typo.body2">
+                           <h5>Add claims client side via the PersistentAuthenticationStateProvider</h5>
+                            <br />
+                            <CodeBlock Language="csharp">
+                                @claimsSnippet
+                            </CodeBlock>
+                            <br />
+                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts" Target="_blank">Microsoft Blazor docs</MudLink>
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="12" md="4">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
+                        <MudText Class="flex-auto" Typo="Typo.body2">
+                            <h5>Server side PersistingRevalidatingAuthenticationStateProvider</h5>
+                            <br />
+                            <CodeBlock Language="csharp">
+                                @revalidatingServerSideSnippet
+                            </CodeBlock>
+                            <br />
+                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts" Target="_blank">Microsoft Blazor docs</MudLink>
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
     </MudSection>
 </MudPage>
 
 @code {
+    private string programSnippet = @"
+    //In program.cs Server side where you IdentityCore is primarily set
+    //add the AddRoles\<IdentityRole>() to implement roles with
+    //optionnally add a role manager AddRoleManager\<RoleManager<IdentityRole>>() to handle manipulating roles easier in the application
+    builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddRoles<IdentityRole>()                          //<----this
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddRoleManager<RoleManager<IdentityRole>>()       //<---& this
+        .AddSignInManager()
+        .AddDefaultTokenProviders();)
+     ";
+    private string claimsSnippet = @"
+    public PersistentAuthenticationStateProvider(PersistentComponentState state)
+    {
+        if (!state.TryTakeFromJson<UserInfo>(nameof(UserInfo), out var userInfo) || userInfo is null)
+        {
+            return;
+        }
 
+        List<Claim> claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
+            new Claim(ClaimTypes.Name, userInfo.Email),
+            new Claim(ClaimTypes.Email, userInfo.Email)
+        };
+        // Add the role claims
+        foreach (var role in userInfo.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        authenticationStateTask = Task.FromResult(
+            new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims,
+                authenticationType: nameof(PersistentAuthenticationStateProvider)))));
+    }
+    ";
+    private string revalidatingServerSideSnippet = @"
+    private async Task OnPersistingAsync()
+    {
+        if (authenticationStateTask is null)
+        {
+            throw new UnreachableException($""Authentication state not set in {nameof(OnPersistingAsync)}()."");
+        }
+
+        var authenticationState = await authenticationStateTask;
+        var principal = authenticationState.User;
+        //This needs to be configured for roles to be persisted in claims and available in the client and for the server to check roles
+        if (principal.Identity?.IsAuthenticated == true)
+        {
+            // Retrieve the user ID from the claims
+            var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
+            // Retrieve the email from the claims
+            var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
+            // Retrieve all roles from the claims
+            var roles = principal.FindAll(options.ClaimsIdentity.RoleClaimType).Select(claim => claim.Value).ToList();
+
+            // Ensure userId and email are not null before persisting the state
+            if (userId != null && email != null)
+            {
+                // Persist the user information including roles to the state
+                state.PersistAsJson(nameof(UserInfo), new UserInfo
+                {
+                    UserId = userId,
+                    Email = email,
+                    Roles = roles
+                });
+            }
+        }
+    }
+    ";
 }

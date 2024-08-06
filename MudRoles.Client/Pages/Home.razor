@@ -1,25 +1,26 @@
 ﻿@page "/"
 @using MudBlazor.Extensions.Components.ObjectEdit.Options
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 <PageTitle>Home</PageTitle>
 
 <MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
     <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
         <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-            <MudText Typo="Typo.h1">Blazor Identity with Roles</MudText>
+         &nbsp;   <MudText Typo="Typo.h1">Blazor Identity with Roles</MudText>
         </MudPaper>
     </MudSection>
     <MudSection Class="pb-6" Column="1" ColSpan="6" Row="2" RowSpan="2">
         <MudExCardList @ref="component" TData="object">
             @foreach (var topic in topics)
             {
-                <MudCard Elevation="2" Outlined="true" Style="width:262px">
+                <MudCard Elevation="2" Outlined="true" Class="bg-red" Style="width:262px;">
                     <MudCardHeader Style="z-index: 5">
                         <CardHeaderContent>
                             <MudText Typo="Typo.h6">@topic.Title</MudText>
                         </CardHeaderContent>
                         <CardHeaderActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Camera" Color="Color.Default" />
+                            <MudIconButton Icon="@GetIcon(topic.Icon)" Color="Color.Primary" />
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent Style="z-index: 5">
@@ -27,10 +28,11 @@
                         <MudText Typo="Typo.body2">@topic.Subline</MudText>
                     </MudCardContent>
                     <MudCardActions Style="z-index: 5">
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => NavigateToPage(topic.Link))">Read More</MudButton>
                     </MudCardActions>
                 </MudCard>
             }
+            
         </MudExCardList>
     </MudSection>
 </MudPage>
@@ -67,32 +69,50 @@ function helloWorld() {
 }
 </CodeBlock>
 @code {
-    private List<TopicModel> topics = new List<TopicModel>();
-    MudExCardList<object>? component;
 
+    private List<TopicModel> topics = new List<TopicModel>();
+    MudBlazor.Extensions.Components.MudExCardList<object>? component;
+    private readonly Dictionary<string, string> iconMappings = new()
+    {
+        { "Icons.Material.Filled.Security", Icons.Material.Filled.Security },
+        { "Icons.Custom.Brands.MudBlazor", Icons.Custom.Brands.MudBlazor },
+        { "Icons.Material.Filled.Api", Icons.Material.Filled.Api },
+        { "Icons.Material.Filled.Mediation", Icons.Material.Filled.Mediation }
+    };
+    private void NavigateToPage(string endpoint)
+    {
+        Navigation.NavigateTo(endpoint);
+    }
     protected override Task OnInitializedAsync()
     {
         var jsonString = @"
         [
-            { ""Title"": ""Blazor Identity with Roles"", ""Text"": ""Implementing identity management with role-based access control in Blazor applications."", ""Subline"": ""Secure your Blazor apps with role-based identity management."" },
-            { ""Title"": ""MudBlazor"", ""Text"": ""Utilizing MudBlazor components to build modern and responsive web applications."", ""Subline"": ""Enhance your Blazor apps with MudBlazor's rich component library."" },
-            { ""Title"": ""MudBlazor Static"", ""Text"": ""Creating static web pages using MudBlazor components for a seamless user experience."", ""Subline"": ""Build static web pages with MudBlazor's powerful components."" },
-            { ""Title"": ""CodeBeam MudBlazor Extensions"", ""Text"": ""Extending MudBlazor with custom components and additional functionalities."", ""Subline"": ""Customize and extend MudBlazor to fit your specific needs."" },
-            { ""Title"": ""Highlight.js"", ""Text"": ""Integrating Highlight.js for syntax highlighting in your web applications."", ""Subline"": ""Add beautiful syntax highlighting to your code blocks with Highlight.js."" },
-            { ""Title"": ""Role-based Secure APIs"", ""Text"": ""Developing secure APIs with role-based access control to protect your data."", ""Subline"": ""Implement role-based security for your APIs to ensure data protection."" },
-            { ""Title"": ""API Keys Generation"", ""Text"": ""Generating and managing API keys for secure access to your services."", ""Subline"": ""Secure your APIs with robust API key generation and management."" },
-            { ""Title"": ""Services Dependency Injection"", ""Text"": ""Implementing dependency injection for services in your applications."", ""Subline"": ""Leverage dependency injection to manage services efficiently in your apps."" }
+            { ""Title"": ""Blazor Identity with Roles"", ""Text"": ""Implementing identity management with role-based access control in Blazor applications."", ""Subline"": ""Secure your Blazor apps with role-based identity management."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""/blazoridentity""  },
+            { ""Title"": ""MudBlazor"", ""Text"": ""Utilizing MudBlazor components to build modern and responsive web applications."", ""Subline"": ""Enhance your Blazor apps with MudBlazor's rich component library."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""/workingwithmudblazor"" },
+            { ""Title"": ""MudBlazor Static"", ""Text"": ""Creating static web pages using MudBlazor components for a seamless user experience."", ""Subline"": ""Build static web pages with MudBlazor's powerful components."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""mudblazor"" },
+            { ""Title"": ""CodeBeam MudBlazor Extensions"", ""Text"": ""Extending MudBlazor with custom components and additional functionalities."", ""Subline"": ""Customize and extend MudBlazor to fit your specific needs."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""mudblazorstatic"" },
+            { ""Title"": ""Highlight.js"", ""Text"": ""Integrating Highlight.js for syntax highlighting in your web applications."", ""Subline"": ""Add beautiful syntax highlighting to your code blocks with Highlight.js."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""codebeam"" },
+            { ""Title"": ""Role-based Secure APIs"", ""Text"": ""Developing secure APIs with role-based access control to protect your data."", ""Subline"": ""Implement role-based security for your APIs to ensure data protection."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""roleapi"" },
+            { ""Title"": ""API Keys Generation"", ""Text"": ""Generating and managing API keys for secure access to your services."", ""Subline"": ""Secure your APIs with robust API key generation and management."", ""Icon"": ""Icons.Material.Filled.Api"", ""Link"": ""apikeysforendpoints"" },
+            { ""Title"": ""Services Dependency Injection"", ""Text"": ""Implementing dependency injection for services in your applications."", ""Subline"": ""Leverage dependency injection to manage services efficiently in your apps."", ""Icon"": ""Icons.Material.Filled.Mediation"", ""Link"": ""dependency"" }
         ]";
 
-        topics = JsonSerializer.Deserialize<List<TopicModel>>(jsonString)!;
+        var deserializedTopics = JsonSerializer.Deserialize<List<TopicModel>>(jsonString);
+        if (deserializedTopics != null)
+        {
+            topics = deserializedTopics;
+        }
         return Task.CompletedTask;
     }
-
-    private Action<ObjectEditMeta<MudExCardList<object>>> Configure()
+    private string GetIcon(string iconName)
+    {
+        return iconMappings.TryGetValue(iconName, out var icon) ? icon : string.Empty;
+    }
+    private Action<MudBlazor.Extensions.Components.ObjectEdit.Options.ObjectEditMeta<MudBlazor.Extensions.Components.MudExCardList<object>>> Configure()
     {
         return meta =>
         {
-            meta.Property(m => m.HoverMode).Ignore();
+            meta.Property(m => m.HoverMode);
         };
     }
 
@@ -101,6 +121,8 @@ function helloWorld() {
         public string Title { get; set; } = string.Empty;
         public string Text { get; set; } = string.Empty;
         public string Subline { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public string Link { get; set; } = string.Empty;
     }
 
 }
