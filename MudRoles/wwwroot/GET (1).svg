@@ -3,3 +3,17 @@
 ]]></tspan></text><text dx="0" dy="0" font-family="&quot;Roboto&quot;" font-size="20" font-weight="400" transform="matrix(1.680731 0 0 2.955545 108.514687 162.578811)" stroke-width="0"><tspan y="0" font-weight="400" stroke-width="0"><![CDATA[
 GET
 ]]></tspan></text></svg>
+@Icons.Material.Filled.OpenInBrowser
+
+public class PersonModel
+{
+    public int Id { get; set; }
+    [Display(Name="First Name")]
+    public string Name { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    [BlazinHeaderFormat("{0:C}")]
+    public int Salary { get; set; }
+    [BlazinHeaderIgnore]
+    public string ThisColumnWontEvenShowUp { get; set; }
+}

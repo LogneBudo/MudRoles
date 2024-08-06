@@ -1,12 +1,20 @@
 ﻿@page "/apikeys"
 @using MudRoles.Client.Models
+@using System.Net.Http.Json
 @inject HttpClient HttpClient
 @inject IDialogService DialogService
 @attribute [Authorize]
 <PageTitle>Api Management</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">API Keys Management</MudText>
-<MudText Typo="Typo.body1" GutterBottom="true">These API Keys should only be used when developping and testing your application</MudText>
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h3" GutterBottom="true">API Keys Management</MudText>
+        <MudText Typo="Typo.body1" GutterBottom="true">These API Keys should only be used when developing and testing your application</MudText>
+    </MudItem>
+    <MudItem xs="12" Class="d-flex justify-end">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="@(() => PostGenerateAsync(scopes))">Generate API Keys</MudButton>
+    </MudItem>
+</MudGrid>
 
 <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
          ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
@@ -14,22 +22,49 @@
         <MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
         <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
             <Columns>
-                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" />
+                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
                 <TemplateColumn Title="Key">
                     <CellTemplate Context="cellContext">
                         @if (cellContext.Item.Key != null)
                         {
-                            <MudFab Class="key-button" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 8)}")" />
+                            <MudFab Size="Size.Small" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 5)}")" />
                         }
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x => x.CreationDate" Title="Created" />
-                <PropertyColumn Property="x => x.ExpirationDate" Title="Expires" />
-                <PropertyColumn Property="x => x.KeyPrefix" />
-                <TemplateColumn CellClass="d-flex justify-end">
+                <TemplateColumn Title="Scopes">
+                    <CellTemplate Context="cellContext">
+                        @foreach (var scope in cellContext.Item.Scopes)
+                        {
+                            <MudChip Color="Color.Primary" Icon="@Icons.Material.Filled.Api" Variant="Variant.Outlined" Class="m-1">
+                                @($"{scope.Controller}")
+                            </MudChip>
+                            <MudChip Size="Size.Small" Color="Color.Dark">  @($"{scope.Verb}") </MudChip>
+                            <MudChip Size="Size.Small" Color="Color.Primary">  @($"{scope.Endpoint}") </MudChip><br />
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Created">
+                    <CellTemplate Context="cellContext">
+                        @if (true)
+                        {
+                            @cellContext.Item.CreationDate.ToFormattedString("yyyy-MM-dd HH:mm")
+                        }
+                       
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Expires">
+                    <CellTemplate Context="cellContext">
+                        @if (true)
+                        {
+                            @cellContext.Item.ExpirationDate.ToTimeSpanString(cellContext.Item.CreationDate)
+                        }
+
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn CellClass="justify-end">
                     <CellTemplate>
                         <MudStack Row>
-                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
+                            <MudButton Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
@@ -42,13 +77,13 @@
         <br />
         <br />
         <MudText Typo="Typo.h5" GutterBottom="true">Recently Expired</MudText>
-        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
+        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys.Where(x => x.ExpirationDate < DateTime.Now).ToList()">
             <Columns>
-                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" />
+                <PropertyColumn Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
                 <PropertyColumn Property="x => x.Key" />
                 <PropertyColumn Property="x => x.CreationDate" Title="Created" />
-                <PropertyColumn Property="x => x.ExpirationDate" Title="Expires" />
-                <PropertyColumn Property="x => x.KeyPrefix" />
+                <PropertyColumn Property="x => x.ExpirationDate.ToShortDateString()" Title="Expires" />
+                <PropertyColumn Property="x => x.Scopes" />
                 <TemplateColumn CellClass="d-flex justify-end">
                     <CellTemplate>
                         <MudStack Row>
@@ -58,7 +93,7 @@
                 </TemplateColumn>
             </Columns>
             <NoRecordsContent>
-                <MudText>No keys available</MudText>
+                <MudText>No Expired keys available</MudText>
             </NoRecordsContent>
         </MudDataGrid>
     </MudTabPanel>
@@ -70,7 +105,6 @@
     </MudTabPanel>
 </MudTabs>
 <br />
-<MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="@(() => PostGenerateAsync(scopes))">Generate API Keys</MudButton>
 <style>
     .mud-table-head {
         font-weight: 500;
@@ -88,7 +122,12 @@
         await LoadScopes();
         await LoadApiKeys();
     }
+    private Func<ApiKey, string> _cellStyleFunc => x =>
+    {
+        string style = "font-weight:bold";
 
+        return style;
+    };
     private async Task PostGenerateAsync(List<Scope> scopes)
     {
         var parameters = new DialogParameters<ApiKeyDialog> { { x => x.Scopes, scopes } };
@@ -96,14 +135,15 @@
 
         var dialog = await DialogService.ShowAsync<ApiKeyDialog>("API Key Generator", parameters, options);
         var result = await dialog.Result;
-
+        KeyInputModel keyResult = new();
         if (result != null && !result.Canceled)
         {
-            var name = result.Data;
-
+            keyResult = result.Data as KeyInputModel ?? new KeyInputModel();
+            var name = keyResult.ApiKeyName;
+            var scopejson = keyResult.Scopes;
         }
 
-        var response = await HttpClient.PostAsync("api/apikeys", null);
+        var response = await HttpClient.PostAsJsonAsync<KeyInputModel>("api/apikeys", keyResult);
         if (response.IsSuccessStatusCode)
         {
             await LoadApiKeys(); // Reload the keys after generating a new one
@@ -115,8 +155,8 @@
     }
     public sealed class Scope
     {
-        public string Controller { get; set; }
-        public string Verb { get; set; }
+        public string? Controller { get; set; }
+        public string? Verb { get; set; }
         public string? Endpoint { get; set; }
         public bool IsChecked { get; set; }
     }
@@ -158,5 +198,6 @@
         public DateTime CreationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string? UserId { get; set; }
+        public List<Scope> Scopes { get; set; } = new();
     }
 }

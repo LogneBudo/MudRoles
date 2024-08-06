@@ -1,0 +1,32 @@
+﻿@using MudBlazor
+@inject IJSRuntime JS
+
+<MudPaper Elevation="2" Class="p-4">
+    <div class="code-block">
+        <pre class="code"><code class="@Language" data-language="@Language">
+                @ChildContent
+        </code></pre>
+    </div>
+</MudPaper>
+<style>
+    .hljs {
+        background: #2d2b57; /* Set your desired background color */
+        padding: 0.5em;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Language { get; set; } = "csharp";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("highlightSnippet");
+        }
+    }
+}

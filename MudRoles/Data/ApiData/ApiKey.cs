@@ -27,7 +27,7 @@ namespace MudRoles.Data.ApiData
 
         public List<Scope> Scopes
         {
-            get => JsonSerializer.Deserialize<List<Scope>>(ScopesJson) ?? new List<Scope>();
+            get => JsonSerializer.Deserialize<List<Scope>>(ScopesJson) ?? [];
             set => ScopesJson = JsonSerializer.Serialize(value);
         }
     }

@@ -62,7 +62,32 @@ namespace MudRoles.Infrastructure.Api
                 result.Append(base32Chars[buffer[4] & 0x1F]);
             }
 
-            return result.ToString().TrimEnd('=');
+            return RemoveConsecutiveDuplicates(result.ToString().TrimEnd('='));
+        }
+
+        /// <summary>
+        /// Removes consecutive duplicate characters from a string.
+        /// </summary>
+        /// <param name="input">The input string.</param>
+        /// <returns>A string with consecutive duplicate characters removed.</returns>
+        private static string RemoveConsecutiveDuplicates(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            StringBuilder result = new StringBuilder();
+            char previousChar = '\0';
+
+            foreach (char currentChar in input)
+            {
+                if (currentChar != previousChar)
+                {
+                    result.Append(currentChar);
+                    previousChar = currentChar;
+                }
+            }
+
+            return result.ToString();
         }
 
         /// <summary>

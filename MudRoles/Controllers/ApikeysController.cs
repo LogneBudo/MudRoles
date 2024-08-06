@@ -6,6 +6,8 @@ using System.Security.Claims;
 using MudRoles.Data;
 using MudRoles.Infrastructure.Api;
 using ApiKey = MudRoles.Data.ApiData.ApiKey;
+using MudRoles.Client.Components;
+using System.Text.Json;
 
 namespace MudRoles.Controllers
 {
@@ -51,7 +53,7 @@ namespace MudRoles.Controllers
         // POST: api/ApiKeys
         [HttpPost]
         [Authorize(Roles = "Admin,User")] // Both Admin and User roles can request new API keys
-        public async Task<ActionResult<ApiKey>> PostApiKey()
+        public async Task<ActionResult<ApiKey>> PostApiKey(KeyInputModel formData)
         {
             // Ensure the user is authenticated
             if (User.Identity?.IsAuthenticated != true)
@@ -69,14 +71,14 @@ namespace MudRoles.Controllers
             }
             var apiKey = new ApiKey
             {
-                Name = user.UserName ?? "DefaultName", // Default name
-                KeyPrefix = "API-KEY",
+                Name = formData.ApiKeyName ?? "DefaultName", // Default name
+                KeyPrefix = "Akee-CP",
                 Key = ApiKeyGenerator.GenerateApiKey(),
                 CreationDate = DateTime.UtcNow,
                 ExpirationDate = DateTime.UtcNow.AddYears(1), // Example: 1 year expiration
                 UserId = user.Id, // Assuming the owner is the current user
                 Status = KeyStatus.Active,
-                //Scopes = new List<Scope> { new Scope {  ScopeVerb = "GET", EndPoint = "/api/apikeys" }, new Scope { ScopeVerb = "Post", EndPoint = "/api/apikeys" } }
+                ScopesJson = JsonSerializer.Serialize(formData.Scopes.Where(x=> x.IsChecked))
             };
             _context.ApiKeys.Add(apiKey);
             await _context.SaveChangesAsync();

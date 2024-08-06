@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -5,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Extensions;
 using MudBlazor.Services;
 using MudRoles;
+using MudRoles.Client.Components;
 using MudRoles.Client.Infrastructure.Settings;
 using MudRoles.Client.Pages;
 using MudRoles.Components;
 using MudRoles.Components.Account;
 using MudRoles.Data;
 using MudRoles.Infrastructure.Api;
+using MudExtensions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
@@ -20,6 +23,7 @@ builder.Services.AddMudServicesWithExtensions(options =>
 {
     options.PopoverOptions.ThrowOnDuplicateProvider = false;
 });
+builder.Services.AddMudExtensions();
 builder.Services.AddScoped<ThemeService>();
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -53,7 +57,7 @@ builder.Services.AddDbContext<ApiKeyDbContext>(options =>
            options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection")));
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+builder.Services.AddValidatorsFromAssemblyContaining<KeyInputModelValidator>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
