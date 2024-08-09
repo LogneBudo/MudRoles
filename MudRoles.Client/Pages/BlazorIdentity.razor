@@ -1,82 +1,190 @@
 ﻿@page "/blazoridentity"
 <PageTitle>Blazor Identity</PageTitle>
 
-<MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
-        <MudPaper Elevation="0" Class="d-flex flex-column flex-wrap gap-4 align-center justify-center">
-            <MudIconButton Class="flex-auto" Icon="@Icons.Material.Filled.Security" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Class="flex-auto" Typo="Typo.h1">Blazor Identity with Roles</MudText>
-            <MudText Class="flex-auto" Typo="Typo.h3">Configuring Blazor</MudText>
-        </MudPaper>
-    </MudSection>
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="2">
-        <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-            <MudGrid>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
-                        <MudText Class="flex-auto" Typo="Typo.h4">Step 1: Add Roles</MudText>
-                        
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
-                        <MudText Class="flex-auto" Typo="Typo.h4">Step 2: Add Claims</MudText>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="12" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;">
-                        <MudText Class="flex-auto" Typo="Typo.h4">Step 3: Fix Persistence Revalitation</MudText>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
-                        <MudText Class="flex-auto" Typo="Typo.body2">
-                            <h5>Server side program.cs file</h5>
-                            <br />
-                            <CodeBlock Language="csharp">
-                                @programSnippet
-                            </CodeBlock>
-                            <br />
-                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-8.0#add-role-services-to-identity" Target="_blank">Microsoft Blazor docs on adding Roles</MudLink>
-                        </MudText>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="6" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
-                        <MudText Class="flex-auto" Typo="Typo.body2">
-                           <h5>Add claims client side via the PersistentAuthenticationStateProvider</h5>
-                            <br />
-                            <CodeBlock Language="csharp">
-                                @claimsSnippet
-                            </CodeBlock>
-                            <br />
-                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts" Target="_blank">Microsoft Blazor docs</MudLink>
-                        </MudText>
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="12" sm="12" md="4">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 900px;">
-                        <MudText Class="flex-auto" Typo="Typo.body2">
-                            <h5>Server side PersistingRevalidatingAuthenticationStateProvider</h5>
-                            <br />
-                            <CodeBlock Language="csharp">
-                                @revalidatingServerSideSnippet
-                            </CodeBlock>
-                            <br />
-                            <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts" Target="_blank">Microsoft Blazor docs</MudLink>
-                        </MudText>
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudContainer>
-    </MudSection>
-</MudPage>
+<MudPaper Elevation="2" Class="d-flex flex-column flex-wrap align-center justify-center">
+    <MudIconButton Icon="@Icons.Material.Filled.Security" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Typo="Typo.h2">Blazor Identity with Roles</MudText>
+    <MudText Typo="Typo.h3">Configuring Blazor</MudText>
+    <br />
+</MudPaper>
+<MudAlert Severity="Severity.Warning">Don't forget to test your setup with placing either an @@attribute [Authorize] at the base of your component that is to be protected for signed in users or [Authorize(Roles = &quot;Admin,User&quot;)]</MudAlert>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 1: Add Roles</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    Let’s break down the concept of roles in a simple and easy-to-understand way.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Roles</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    Think of roles as job titles or positions that define what a person can do within a system or organization. 
+                    Each role comes with a set of permissions or responsibilities that determine what actions the person in 
+                    that role is allowed to perform.
+                    <br />
+                    For example, imagine a school:
+                    <br /><br />
+                    <ul>
+                        <li><b>Student</b>: A student can attend classes, submit assignments, and participate in school activities.</li>
+                        <li><b>Teacher</b>: A teacher can teach classes, grade assignments, and manage students.</li>
+                        <li><b>Principal</b>: A principal can oversee the entire school, make important decisions, and manage teachers and students.</li>
+                    </ul>
+                    <br />
+                    In this example, each role (student, teacher, principal) has specific permissions and responsibilities.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Why are Roles important</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    Roles help to organize and manage what different people can do within a system. By assigning roles, 
+                    you can control access to certain features and ensure that only authorized individuals 
+                    can perform specific actions.
+                    <br />
+                    Here's a simple analogy:
+                    <br /><br />
+                    <ul>
+                        <li><b>Role</b>: Job title (e.g., student, teacher, principal)</li>
+                        <li><b>Permissions</b>: Actions that the person in that role is allowed to perform</li>
+                    </ul>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 2: Add Claims</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    Let’s break down the concepts of Claims and Principal 
+                    in a simple and easy-to-understand way!
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Claims</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    Think of <b>claims</b> as pieces of information about a user. These pieces of information can
+                    include things like the user’s name, email address, roles, and permissions. Claims are 
+                    used to describe the user’s identity and what they are allowed to do in an application.
+                    <br />
+                    For example, imagine you have a library card. The information on your library card 
+                    (like your name, library ID, and the types of books you can borrow) are like claims. 
+                    They tell the library who you are and what you can do.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Principal</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    The <b>principal</b> is the user or entity that is being described by the claims.
+                    In other words, the principal is the person or thing that the claims are about.
+
+                    Continuing with the library example, you (the person holding the library card) 
+                    are the principal. The library card contains claims about you, and you are the principal that those claims describe.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Put it together</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    In the context of an application, when a user logs in, the system creates 
+                    a principal for that user and attaches claims to it. This way, 
+                    the application knows who the user is and what they are allowed to do based on the claims.
+
+                    Here’s a simple analogy:
+
+                    Principal: The logged in user or you as a logged in user (the user)
+                    Claims: Information on your library card (name, ID, borrowing privileges)
+                    I hope this helps! If you have any more questions or need further clarification, feel free to ask.
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 3: Fix Persistence Revalidation</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    Let’s break down the concept of Revalidation also in a simple and easy-to-understand way.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Persistence Revalidation with Identity Core</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    n the context of Blazor and Identity Core, persistence revalidation ensures that the 
+                    authentication state of a user remains accurate and up-to-date. This is particularly 
+                    important for maintaining security and ensuring that user roles and permissions are
+                    correctly enforced.
+                    <br />
+                    Here’s how it works in the provided <span style="color: blue;;font-weight:600">PersistingRevalidatingAuthenticationStateProvider</span> class.
+                    <br /><br />
+                    <ul>
+                        <li><b>RevalidatingServerAuthenticationStateProvider</b>: This class extends `RevalidatingServerAuthenticationStateProvider`, which periodically 
+                            revalidates the security stamp of the connected user. This ensures that the user’s authentication state is still valid.  
+                            to periodically revalidate the security stamp of the connected user.</li>
+                        <li><b>Revalidation Interval</b>: Set to 30 minutes, meaning the system checks the user's authentication state every 30 minutes.</li>
+                        <li><b>ValidateAuthenticationStateAsync</b>: Validates the user's authentication state by fetching fresh data from the user manager.</li>
+                        <li><b>OnPersistingAsync</b>: Ensures the authentication state, including user roles, is persisted to the client.</li>
+                        <li><b>PersistentComponentState</b>: Used to flow the authentication state to the client, fixing it for the lifetime of the WebAssembly application.</li>
+                        <li><b>Claims and Principal</b>: Retrieves the user ID, email, and roles from the claims and stores them in the `PersistentComponentState`.</li>
+                    </ul>
+                    <br />
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 940px;">
+                <MudText Class="flex-auto" Typo="Typo.body2">
+                    <h5>Server side program.cs file</h5>
+                    <br />
+                    <p>
+                        When you create your application either through Command line with dotnet new mudblazor --interactivity Auto --auth Individual --all-interactive ,
+                        or through Visual Studio with the MudBlazor template, you will have a program.cs file that is configured to use IdentityCore. It containes already everything preconfigured
+                        for handling Users and Authentication, however Roles are not configured by default. To add roles you need to add the AddRoles &lt;<span style="color: blue;;font-weight:600">IdentityRole</span>&gt;()
+                        to the IdentityCore configuration.
+                    </p>
+                    <br />
+                    <CodeBlock Language="csharp">
+                        @programSnippet
+                    </CodeBlock>
+                    <br />
+                    <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-8.0#add-role-services-to-identity" Target="_blank">Microsoft Blazor docs on adding Roles</MudLink>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 940px;">
+                <MudText Class="flex-auto" Typo="Typo.body2">
+                    <h5>Add claims client side via the PersistentAuthenticationStateProvider</h5>
+                    <br />
+                    <p>
+                        Client side the claims generation is handled by the internal class in the root of your client-side project <span style="color: blue;font-weight:600">PersistentAuthenticationStateProvider</span>.
+                        In the constructor it initializes a new instance of the <span style="color: blue;font-weight:600">PersistentAuthenticationStateProvider</span> and in it the claims for the authenticated Principal are set.
+                        Originally this is done in the generated code through not a List&lt;Claim&gt; claims but through a Claims Array, I have modified the code to manipulate a List of Type which is easier.
+                    </p>
+                    <br />
+                    <CodeBlock Language="csharp">
+                        @claimsSnippet
+                    </CodeBlock>
+                    <br />
+                    <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts" Target="_blank">Microsoft Blazor docs</MudLink>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 940px;">
+                <MudText Class="flex-auto" Typo="Typo.body2">
+                    <h5>Server side PersistingRevalidatingAuthenticationStateProvider</h5>
+                    <br />
+                    <CodeBlock Language="csharp">
+                        @revalidatingServerSideSnippet
+                    </CodeBlock>
+                    <br />
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
     private string programSnippet = @"
     //In program.cs Server side where you IdentityCore is primarily set
-    //add the AddRoles\<IdentityRole>() to implement roles with
-    //optionnally add a role manager AddRoleManager\<RoleManager<IdentityRole>>() to handle manipulating roles easier in the application
-    builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    //add the AddRoles<IdentityRole>() to implement roles with
+    //optionnally add a role manager AddRoleManager<RoleManager<IdentityRole>>() 
+    //to handle manipulating roles easier in the application
+    builder.Services
+        .AddIdentityCore<ApplicationUser>(opt => opt.SignIn.RequireConfirmedAccount = true)
         .AddRoles<IdentityRole>()                          //<----this
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddRoleManager<RoleManager<IdentityRole>>()       //<---& this
@@ -97,6 +205,7 @@
             new Claim(ClaimTypes.Name, userInfo.Email),
             new Claim(ClaimTypes.Email, userInfo.Email)
         };
+
         // Add the role claims
         foreach (var role in userInfo.Roles)
         {
@@ -112,25 +221,33 @@
     {
         if (authenticationStateTask is null)
         {
-            throw new UnreachableException($""Authentication state not set in {nameof(OnPersistingAsync)}()."");
+            throw new UnreachableException(
+                $""Authentication state not set in {nameof(OnPersistingAsync)}()."");
         }
 
         var authenticationState = await authenticationStateTask;
         var principal = authenticationState.User;
-        //This needs to be configured for roles to be persisted in claims and available in the client and for the server to check roles
+        //This needs to be configured for roles to be persisted 
+        //in claims and available in the client and for the server 
+        //to check roles
         if (principal.Identity?.IsAuthenticated == true)
         {
             // Retrieve the user ID from the claims
-            var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
+            var userId = principal
+                            .FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
             // Retrieve the email from the claims
-            var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
+            var email = principal
+                            .FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
             // Retrieve all roles from the claims
-            var roles = principal.FindAll(options.ClaimsIdentity.RoleClaimType).Select(claim => claim.Value).ToList();
+            var roles = principal
+                            .FindAll(options.ClaimsIdentity.RoleClaimType).Select(claim => claim.Value).ToList();
 
-            // Ensure userId and email are not null before persisting the state
+            // Ensure userId and email are 
+            //not null before persisting the state
             if (userId != null && email != null)
             {
-                // Persist the user information including roles to the state
+                // Persist the user information 
+                //including roles to the state
                 state.PersistAsJson(nameof(UserInfo), new UserInfo
                 {
                     UserId = userId,

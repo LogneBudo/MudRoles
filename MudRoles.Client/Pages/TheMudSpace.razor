@@ -1,18 +1,254 @@
 ﻿@page "/themudspace"
 <PageTitle>Working with MudBlazor</PageTitle>
+<MudPaper Elevation="2" Class="d-flex flex-column flex-wrap align-center justify-center">
+    <MudIconButton Icon="@Icons.Material.Filled.Api" Color="Color.Primary" Size="Size.Large" />
+        &nbsp;<MudText Typo="Typo.h2"><span style="@($"font-weight:600;color: {Colors.DeepPurple.Default};")">MudBlazor</span> Components</MudText>
+    <MudText Typo="Typo.h3">Theme <span style="font-weight:600;">Stuff</span></MudText>
+    <br />
+</MudPaper>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="6">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Typo="Typo.h4">Custom Theme implementation</MudText>
+                <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
+                    <MudTabPanel Text="Explanation">
+                        <MudText Typo="Typo.h5">Custom Theme implementation</MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">There are plenty of reasons to want to implement your own custom theme, 
+                            the default theme holds a lot of the essence of best practices for designs systems, but if a neutral balanced 
+                            theme doesn't suit your needs then you can implement your own theme easily in code.</MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">
+                           Custom themes offer a handy way of implementing branding specifities if well implemented. A few things to keep in mind never try to directly change the core css
+                           files. The Theme provider and the Theme Class exposes all you need to fine tune your own theme.
+                           <br/>
+                            <br />
+                           You can expose also a ThemeService to handle things like User preferences in profile and theme options for them. You could think of having a special theme for 
+                           people that are visually specificities that require a special choice of colors.
+                        </MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">
+                            Make sure you pick colors that have harmonies, the theme lets you set Primary, Secondary and Tertiary colors, for that you can use a service to find harmonious combinations 
+                            https://colors.dopely.top/color-harmony-finder 
+                        </MudText>
+                    </MudTabPanel>
+                    <MudTabPanel Text="Theme Code">
+                        <CodeBlock Language="csharp">
+                            @customeTheme
+                        </CodeBlock>
+                    </MudTabPanel>
+                    <MudTabPanel Text="ThemeService Code">
+                        <CodeBlock Language="csharp">
+                            @themeService
+                        </CodeBlock>
+                    </MudTabPanel>
+                </MudTabs>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Typo="Typo.h4">Custom Theme implementation</MudText>
+                <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
+                    <MudTabPanel Text="Explanation">
+                        <MudText Typo="Typo.h5">Custom Theme implementation</MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">
+                            There are plenty of reasons to want to implement your own custom theme,
+                            the default theme holds a lot of the essence of best practices for designs systems, but if a neutral balanced
+                            theme doesn't suit your needs then you can implement your own theme easily in code.
+                        </MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">
+                            Custom themes offer a handy way of implementing branding specifities if well implemented. A few things to keep in mind never try to directly change the core css
+                            files. The Theme provider and the Theme Class exposes all you need to fine tune your own theme.
+                            <br />
+                            <br />
+                            You can expose also a ThemeService to handle things like User preferences in profile and theme options for them. You could think of having a special theme for
+                            people that are visually specificities that require a special choice of colors.
+                        </MudText>
+                        <MudText HtmlTag="p" Typo="Typo.body1">
+                            Make sure you pick colors that have harmonies, the theme lets you set Primary, Secondary and Tertiary colors, for that you can use a service to find harmonious combinations
+                            https://colors.dopely.top/color-harmony-finder
+                        </MudText>
+                    </MudTabPanel>
+                    <MudTabPanel Text="Theme Code">
+                        <CodeBlock Language="csharp">
+                            @customeTheme
+                        </CodeBlock>
+                    </MudTabPanel>
+                    <MudTabPanel Text="ThemeService Code">
+                        <CodeBlock Language="csharp">
+                            @themeService
+                        </CodeBlock>
+                    </MudTabPanel>
+                </MudTabs>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
-<MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
-        <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-           <MudText Typo="Typo.h1">MudBlazor Components</MudText>&nbsp;<MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Primary" Size="Size.Large" />
-        </MudPaper>
-    </MudSection>
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="1">
-
-    </MudSection>
-</MudPage>
-<h3>MudBmazor Components</h3>
 
 @code {
+    private string customeTheme = @"
+    public class MudRolesTheme
+    {
+        private static Typography DefaultTypography = new Typography()
+        {
+            Default = new Default()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = "".875rem"",
+                FontWeight = 400,
+                LineHeight = 1.43,
+                LetterSpacing = "".01071em""
+            },
+            H1 = new H1()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""6rem"",
+                FontWeight = 300,
+                LineHeight = 1.167,
+                LetterSpacing = ""-.01562em""
+            },
+            H2 = new H2()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""3.75rem"",
+                FontWeight = 300,
+                LineHeight = 1.2,
+                LetterSpacing = ""-.00833em""
+            },
+            H3 = new H3()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""3rem"",
+                FontWeight = 400,
+                LineHeight = 1.167,
+                LetterSpacing = ""0""
+            },
+            H4 = new H4()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""2.125rem"",
+                FontWeight = 400,
+                LineHeight = 1.235,
+                LetterSpacing = "".00735em""
+            },
+            H5 = new H5()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""1.5rem"",
+                FontWeight = 400,
+                LineHeight = 1.334,
+                LetterSpacing = ""0""
+            },
+            H6 = new H6()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""1.25rem"",
+                FontWeight = 400,
+                LineHeight = 1.6,
+                LetterSpacing = "".0075em""
+            },
+            Button = new Button()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = "".875rem"",
+                FontWeight = 500,
+                LineHeight = 1.75,
+                LetterSpacing = "".02857em""
+            },
+            Body1 = new Body1()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = ""1rem"",
+                FontWeight = 400,
+                LineHeight = 1.5,
+                LetterSpacing = "".00938em""
+            },
+            Body2 = new Body2()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = "".875rem"",
+                FontWeight = 400,
+                LineHeight = 1.43,
+                LetterSpacing = "".01071em""
+            },
+            Caption = new Caption()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = "".75rem"",
+                FontWeight = 400,
+                LineHeight = 1.66,
+                LetterSpacing = "".03333em""
+            },
+            Subtitle2 = new Subtitle2()
+            {
+                FontFamily = new[] { ""Montserrat"", ""Helvetica"", ""Arial"", ""sans-serif"" },
+                FontSize = "".875rem"",
+                FontWeight = 600,
+                LineHeight = 1.57,
+                LetterSpacing = "".00714em""
+            }
+        };
 
+        private static LayoutProperties DefaultLayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = ""3px"",
+            AppbarHeight = ""50px""
+        };
+
+        public static MudTheme DefaultTheme = new MudTheme()
+        {
+            PaletteLight = new PaletteLight()
+            {
+                Primary = Colors.DeepPurple.Default,
+                AppbarBackground = Colors.DeepPurple.Default,
+                Background = Colors.Gray.Lighten5,
+                Secondary = Colors.Green.Default,
+                Tertiary = Colors.Brown.Default,
+                DrawerBackground = Colors.Gray.Lighten5,
+                DrawerText = ""rgba(0,0,0, 0.7)"",
+                Success = ""#007E33""
+            },
+            Typography = DefaultTypography,
+            LayoutProperties = DefaultLayoutProperties
+        };
+
+        public static MudTheme DarkTheme = new MudTheme()
+        {
+            PaletteDark = new PaletteDark()
+            {
+                Primary = ""#1E88E5"",
+                Success = ""#007E33"",
+                Black = ""#27272f"",
+                Background = ""#32333d"",
+                BackgroundGray = ""#27272f"",
+                Surface = ""#373740"",
+                DrawerBackground = ""#27272f"",
+                DrawerText = ""rgba(255,255,255, 0.50)"",
+                AppbarBackground = ""#373740"",
+                AppbarText = ""rgba(255,255,255, 0.70)"",
+                TextPrimary = ""rgba(255,255,255, 0.70)"",
+                TextSecondary = ""rgba(255,255,255, 0.50)"",
+                ActionDefault = ""#adadb1"",
+                ActionDisabled = ""rgba(255,255,255, 0.26)"",
+                ActionDisabledBackground = ""rgba(255,255,255, 0.12)"",
+                DrawerIcon = ""rgba(255,255,255, 0.50)""
+            },
+            Typography = DefaultTypography,
+            LayoutProperties = DefaultLayoutProperties
+        };
+    }
+    ";
+    private string themeService = @"public class ThemeService
+    {
+        private bool _isDarkMode = false;
+        private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
+
+        public MudTheme CurrentTheme => _currentTheme;
+
+        public void ToggleDarkMode()
+        {
+            _isDarkMode = !_isDarkMode;
+            _currentTheme = _isDarkMode ? MudRolesTheme.DarkTheme : MudRolesTheme.DefaultTheme;
+        }
+    }
+    ";
 }

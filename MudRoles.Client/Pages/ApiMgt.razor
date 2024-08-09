@@ -1,7 +1,6 @@
 ﻿@page "/apikeys"
 @using MudRoles.Client.Models
 @using System.Net.Http.Json
-@using global::MudBlazor
 @inject HttpClient HttpClient
 @inject IDialogService DialogService
 @attribute [Authorize]
@@ -17,9 +16,15 @@
     </MudItem>
 </MudGrid>
 
+@{
+    // TODO this works (C# comment)
+    /* TODO this works 
+     * Voila this is working
+     * (C# multi-line comment) */
+}
 <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
          ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
-    <MudTabPanel Text="Create Key">
+    <MudTabPanel Text="Vault">
         <MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
         <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
             <Columns>
@@ -28,7 +33,7 @@
                     <CellTemplate Context="cellContext">
                         @if (cellContext.Item.Key != null)
                         {
-                            <MudFab Size="Size.Small" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 5)}")" />
+                            <MudFab Size="Size.Small" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 5)}")" OnClick="@(() => ToggleKeyVisibility(cellContext.Item))" />
                         }
                     </CellTemplate>
                 </TemplateColumn>
@@ -40,32 +45,24 @@
                                 @($"{scope.Controller}")
                             </MudChip>
                             <MudChip Size="Size.Small" Color="Color.Dark">  @($"{scope.Verb}") </MudChip>
-                            <MudChip Size="Size.Small" Color="Color.Primary">  @($"{scope.Endpoint}") </MudChip><br />
+                            <MudChip  Size="Size.Small" Color="Color.Primary">  @($"{scope.Endpoint}") </MudChip><br />
                         }
                     </CellTemplate>
                 </TemplateColumn>
                 <TemplateColumn Title="Created">
                     <CellTemplate Context="cellContext">
-                        @if (true)
-                        {
-                            @cellContext.Item.CreationDate.ToFormattedString("yyyy-MM-dd HH:mm")
-                        }
-                       
+                        @cellContext.Item.CreationDate.ToFormattedString("yyyy-MM-dd HH:mm")                      
                     </CellTemplate>
                 </TemplateColumn>
                 <TemplateColumn Title="Expires">
                     <CellTemplate Context="cellContext">
-                        @if (true)
-                        {
-                            @cellContext.Item.ExpirationDate.ToTimeSpanString(cellContext.Item.CreationDate)
-                        }
-
+                        @cellContext.Item.ExpirationDate.ToTimeSpanString(cellContext.Item.CreationDate)
                     </CellTemplate>
                 </TemplateColumn>
                 <TemplateColumn CellClass="justify-end">
-                    <CellTemplate>
+                    <CellTemplate Context="cellContext">
                         <MudStack Row>
-                            <MudButton Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
+                            <MudButton Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(()=> DeleteKey(cellContext.Item.Id))">Delete</MudButton>
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
@@ -98,7 +95,7 @@
             </NoRecordsContent>
         </MudDataGrid>
     </MudTabPanel>
-    <MudTabPanel Text="Store">
+    <MudTabPanel Text="Expiered Keys">
         <MudText>Content Store</MudText>
     </MudTabPanel>
     <MudTabPanel Text="Users">
@@ -113,11 +110,14 @@
         /* Change this to your desired font weight */
 </style>
 @code {
+    private string apiKey = "Akee-CP-3SHN-LZWZ-N7T5-HKGZ-RK5A-4KYX-VLON-PIWS-RAVA-HVXV-JFPD-GUS5-DAQA";
     private List<ApiKey> userApiKeys = new();
     private string errorMessage = string.Empty;
     private List<Scope> scopes = new();
-    [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
+    private async Task DoShit()
+    {
+        await Task.Yield();
+    }
     protected override async Task OnInitializedAsync()
     {
         await LoadScopes();
@@ -131,6 +131,10 @@
     };
     private async Task PostGenerateAsync(List<Scope> scopes)
     {
+        // Add the API key to the request headers
+        HttpClient.DefaultRequestHeaders.Clear();
+        HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
+
         var parameters = new DialogParameters<ApiKeyDialog> { { x => x.Scopes, scopes } };
         var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
@@ -161,10 +165,33 @@
         public string? Endpoint { get; set; }
         public bool IsChecked { get; set; }
     }
+    private async Task DeleteKey(int apiKeyId)
+    {
+        try
+        {
+            var response = await HttpClient.DeleteAsync($"api/apikeys/{apiKeyId}");
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            var errorMessage = "Failed to delete API key.";
+            // Log the exception or handle it as needed
+            Console.WriteLine($"{errorMessage} Exception: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = "An unexpected error occurred.";
+            // Log the exception or handle it as needed
+            Console.WriteLine($"{errorMessage} Exception: {ex.Message}");
+        }
+    }
+
     private async Task LoadScopes()
     {
         try
         {
+            HttpClient.DefaultRequestHeaders.Clear();
+            HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
             var response = await HttpClient.GetFromJsonAsync<List<Scope>>("api/apikeys/scopes");
             scopes = response ?? new List<Scope>(); // Handle null response
             errorMessage = string.Empty; // Clear any previous error messages
@@ -178,6 +205,8 @@
     {
         try
         {
+            HttpClient.DefaultRequestHeaders.Clear();
+            HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
             var response = await HttpClient.GetFromJsonAsync<List<ApiKey>>("api/apikeys");
             userApiKeys = response ?? new List<ApiKey>(); // Handle null response
             errorMessage = string.Empty; // Clear any previous error messages
@@ -187,6 +216,10 @@
             errorMessage = $"Error loading API keys: {ex.Message}";
         }
         StateHasChanged();
+    }
+    private void ToggleKeyVisibility(ApiKey apiKey)
+    {
+        apiKey.IsKeyVisible = !apiKey.IsKeyVisible;
     }
     internal class ApiKey
     {
@@ -200,5 +233,6 @@
         public DateTime ExpirationDate { get; set; }
         public string? UserId { get; set; }
         public List<Scope> Scopes { get; set; } = new();
+        public bool IsKeyVisible { get; set; } = false; // New property to track visibility
     }
 }

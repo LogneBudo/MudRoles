@@ -1,0 +1,287 @@
+﻿@page "/endpointexamples"
+@using MudBlazor
+<MudPaper Elevation="2" Class="d-flex flex-column flex-wrap align-center justify-center">
+    <MudIconButton Icon="@Icons.Material.Filled.Api" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Typo="Typo.h2"><span style="font-weight:600" class="--mud-palette-primary">Examples</span> of Endpoints</MudText>
+    <MudText Typo="Typo.h3">Understanding Endpoint <span style="font-weight:600" class="--mud-palette-primary">VERBS</span></MudText>
+    <br />
+</MudPaper>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Class="flex-auto" Typo="Typo.h4">GET Request Explained</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    A GET request is one of the most common HTTP methods used in web development.
+                    It’s used to retrieve data from a server. Think of it as asking a server for some information,
+                    and the server responds by giving you that information.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">How It Works</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    <ul>
+                         <li>
+                             <b>Client Request:</b> When you type a URL into your web browser and hit enter, your browser sends a GET request
+                            to the server asking for the webpage.
+                        </li>
+                        <li>
+                            <b>Server Response:</b> The server processes the request and sends back the requested data, which could be a webpage,
+                            an image, or any other type of data.
+                        </li>
+                    </ul>
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Key Characteristics</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    <ul>
+                        <li><b>Read-Only:</b> GET requests are used to read or retrieve data. They do not change or modify any data on the server.</li>
+                        <li><b>Idempotent:</b>Making the same GET request multiple times will always produce the same result. It doesn’t matter how many times you ask for the same information; the response will be the same.</li>
+                        <li><b>Cacheable:</b> Responses to GET requests can be cached by the browser, which means the browser can store the response and use it again without making another request to the server.</li>
+                    </ul>
+                    <br /><br />
+                </MudText>
+                <MudText Class="flex-auto" Typo="Typo.h6">Common Uses</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    <ul>
+                        <li><b>Fetching Webpages:</b> When you visit a website, your browser sends a GET request to fetch the HTML content of the page.</li>
+                        <li><b>Retrieving Data:</b>GET requests are used to retrieve data from APIs. For example, you might use a GET request to fetch a list of users, products, or any other data from a server.</li>
+                    </ul>
+                    <br /><br />
+                </MudText>
+                <MudText Class="flex-auto" Typo="Typo.h6">Example Scenario</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    Imagine you have an online store, and you want to display a list of products to your customers. When a customer visits the products page, 
+                    your web application sends a GET request to the server to fetch the list of products. The server processes the request and sends back the 
+                    product data, which is then displayed on the webpage.
+                    <br /><br />
+                </MudText>
+                <MudText Class="flex-auto" Typo="Typo.h6">Error Handling</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    Sometimes, things can go wrong with a GET request. Here are some common errors and what they mean:
+                    <br /><br />
+                    <ul>
+                        <li><b>404 Not Found:</b> The server couldn’t find the requested resource. This usually means the URL is incorrect or the resource doesn’t exist.</li>
+                        <li>
+                            <b>500 Internal Server Error:</b>Something went wrong on the server while processing the request. This is a generic error message indicating a server-side problem.
+                            By understanding GET requests, you can better grasp how data is retrieved from servers and displayed in web applications.
+                        </li>
+                    </ul>
+                    <br /><br />
+                </MudText>
+                <MudText Class="flex-auto" Typo="Typo.h6">Intrinsic Nature of GET Request</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    Sometimes, things can go wrong with a GET request. Here are some common errors and what they mean:
+                    <br /><br />
+                    <ul>
+                        <li>
+                            <b>Method:</b> The HttpRequest object for a GET request has its Method property set to “GET”. This indicates that the request is intended to retrieve data from the server.
+                        </li>
+                        <li>
+                            <b>URI:</b>The RequestUri property contains the Uniform Resource Identifier (URI) of the resource being requested. This URI specifies the location of the resource on the server.
+                        </li>
+                        <li>
+                            <b>Headers:</b>GET requests can include headers that provide additional information about the request. Common headers include:<br />
+                             <ul>
+                                <li>
+                                     <b>Accept:</b>Specifies the media types that the client can handle (e.g., application/json).
+                                </li>
+                                <li>
+                                     <b>User-Agent:</b>Identifies the client software making the request.
+                                </li>
+                                <li>
+                                     <b>Authorization:</b>Contains credentials for authenticating the request.
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>Query Parameters:</b> GET requests often include query parameters in the URI to filter or specify the data being requested. 
+                            These parameters are appended to the URI and separated by a ? character. For example: 'https://api.example.com/users?age=30'.
+                        </li>
+                        <li>
+                            <b>Body:</b>Unlike other HTTP methods (e.g., POST, PUT), GET requests do not have a body. All the necessary information is included in the URI and headers.
+                        </li>
+                        <li>
+                            <b>Idempotency:</b>GET requests are idempotent, meaning that making the same request multiple times will produce the same result without 
+                            causing any side effects on the server. This property is crucial for caching and safe retries.
+                        </li>
+                        <li>
+                            <b>Caching:</b>Responses to GET requests can be cached by clients, proxies, and servers to improve performance and reduce load. The Cache-Control and ETag headers are commonly used to manage caching behavior.
+                        </li>
+                        <li>
+                            <b>Safe Method:</b>GET is considered a safe method because it is intended only to retrieve data and should not have any side effects on the server. This makes it suitable for read-only operations.
+                        </li>
+                    </ul>
+                    <br /><br />
+                    &nbsp;&nbsp;&nbsp; Example of an HttpRequest Object for a GET Request might look like in C#:<br />
+                </MudText>
+                <MudPaper MaxWidth="40%" Elevation="2" Class="p-4">
+                    <CodeBlock Language="csharp">
+                        @requestObject
+                    </CodeBlock>
+                </MudPaper>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <br /><br />
+                    In this example:
+                    <br /><br />
+                    The Method is set to HttpMethod.Get.
+                    <br /><br />
+                    The RequestUri includes the base URI and query parameters.
+                    <br /><br />
+                    The Headers include Accept, User-Agent, and Authorization.
+                    <br /><br />
+                    By understanding the intrinsic nature of GET requests from the standpoint of
+                    an HttpRequest object, you can better appreciate how data retrieval operations are structured
+                    and executed in web applications.<br /><br />
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Class="flex-auto" Typo="Typo.h4">Controllers</MudText>
+                <MudText Typo="Typo.body1">
+                    Examples of GET, PUT, DELETE, PATCH with response and error handling.
+                </MudText>
+                <MudText Typo="Typo.h6">GET Request</MudText>
+                <MudText Typo="Typo.body2">
+                    <br /><br />
+                    A GET request is used to retrieve data from the server. It's like asking for information.
+                    <br />
+                    Example: Fetching a list of users.
+                    <br /><br />
+                </MudText>
+                <MudPaper MaxWidth="40%" Elevation="2" Class="p-4">
+                    <CodeBlock Language="csharp">
+                        @listOfUsers
+                    </CodeBlock>
+                </MudPaper>
+                <MudText Typo="Typo.h6">PUT Request</MudText>
+                <MudText Typo="Typo.body2">
+                    A PUT request is used to update existing data on the server. It's like editing information.
+                    <br />
+                    Example: Updating user details.
+                </MudText>
+                <MudPaper MaxWidth="40%" Elevation="2" Class="p-4">
+                    <CodeBlock Language="csharp">
+                        @updateUser
+                    </CodeBlock>
+                </MudPaper>
+                <MudText Typo="Typo.h6">DELETE Request</MudText>
+                <MudText Typo="Typo.body2">
+                    A DELETE request is used to remove data from the server. It's like deleting information.
+                    <br />
+                    Example: Deleting a user.
+                </MudText>
+                <MudPaper MaxWidth="40%" Elevation="2" Class="p-4">
+                    <CodeBlock Language="csharp">
+                        @deleteUser
+                    </CodeBlock>
+                </MudPaper>
+                <MudText Typo="Typo.h6">PATCH Request</MudText>
+                <MudText Typo="Typo.body2">
+                    A PATCH request is used to partially update data on the server. It's like making small changes.
+                    <br />
+                    Example: Updating a user's email.
+                </MudText>
+                <MudPaper MaxWidth="40%" Elevation="2" Class="p-4">
+                    <MudText Typo="Typo.body2">
+                        <CodeBlock Language="csharp">
+                            @patchUser
+                        </CodeBlock>
+                    </MudText>
+                </MudPaper>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string requestObject = @"
+    var request = new HttpRequestMessage(HttpMethod.Get, ""https://api.example.com/users?age=30"");
+    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(""application/json""));
+    request.Headers.UserAgent.ParseAdd(""MyApp/1.0"");
+    request.Headers.Authorization = new AuthenticationHeaderValue(""Bearer"", ""some-token-here"");
+    ";
+    private string listOfUsers = @"
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                var users = await _userService.GetUsersAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ""Internal server error"");
+            }
+        }
+        ";
+    private string updateUser = @"
+        [HttpPut(""id"")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateModel userModel)
+        {
+            if (id != userModel.Id)
+            {
+                return BadRequest(""User ID mismatch"");
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateUserAsync(userModel);
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ""Internal server error"");
+            }
+        }
+        ";
+    private string deleteUser = @"
+        [HttpDelete(""id"")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                await _userService.DeleteUserAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ""Internal server error"");
+            }
+        }
+        ";
+    private string patchUser = @"
+        [HttpPatch(""id"")]
+        public async Task<IActionResult> PatchUser(int id, [FromBody] JsonPatchDocument<UserUpdateModel> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest(""Invalid patch document"");
+            }
+
+            try
+            {
+                var user = await _userService.GetUserByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                patchDoc.ApplyTo(user);
+                await _userService.UpdateUserAsync(user);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ""Internal server error"");
+            }
+        }
+        ";
+}

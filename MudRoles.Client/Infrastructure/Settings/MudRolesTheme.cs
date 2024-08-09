@@ -8,7 +8,7 @@ namespace MudRoles.Client.Infrastructure.Settings
         {
             Default = new Default()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = ".875rem",
                 FontWeight = 400,
                 LineHeight = 1.43,
@@ -16,7 +16,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H1 = new H1()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "6rem",
                 FontWeight = 300,
                 LineHeight = 1.167,
@@ -24,7 +24,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H2 = new H2()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "3.75rem",
                 FontWeight = 300,
                 LineHeight = 1.2,
@@ -32,7 +32,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H3 = new H3()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "3rem",
                 FontWeight = 400,
                 LineHeight = 1.167,
@@ -40,7 +40,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H4 = new H4()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "2.125rem",
                 FontWeight = 400,
                 LineHeight = 1.235,
@@ -48,7 +48,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H5 = new H5()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "1.5rem",
                 FontWeight = 400,
                 LineHeight = 1.334,
@@ -56,7 +56,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             H6 = new H6()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "1.25rem",
                 FontWeight = 400,
                 LineHeight = 1.6,
@@ -72,7 +72,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             Body1 = new Body1()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "1rem",
                 FontWeight = 400,
                 LineHeight = 1.5,
@@ -80,7 +80,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             Body2 = new Body2()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = ".875rem",
                 FontWeight = 400,
                 LineHeight = 1.43,
@@ -88,7 +88,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             Caption = new Caption()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = ".75rem",
                 FontWeight = 400,
                 LineHeight = 1.66,
@@ -96,7 +96,7 @@ namespace MudRoles.Client.Infrastructure.Settings
             },
             Subtitle2 = new Subtitle2()
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = new[] { "Segoe UI", "Helvetica", "Arial", "sans-serif" },
                 FontSize = ".875rem",
                 FontWeight = 600,
                 LineHeight = 1.57,
@@ -114,10 +114,12 @@ namespace MudRoles.Client.Infrastructure.Settings
         {
             PaletteLight = new PaletteLight()
             {
-                Primary = "#7E6FFF",
-                AppbarBackground = "#7E6FFF",
+                Primary = Colors.DeepPurple.Default,
+                AppbarBackground = Colors.DeepPurple.Default,
                 Background = Colors.Gray.Lighten5,
-                DrawerBackground = "#FFF",
+                Secondary = Colors.Green.Default,
+                Tertiary = Colors.Brown.Default,
+                DrawerBackground = Colors.Gray.Lighten5,
                 DrawerText = "rgba(0,0,0, 0.7)",
                 Success = "#007E33"
             },

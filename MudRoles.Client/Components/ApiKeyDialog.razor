@@ -12,14 +12,11 @@
                         <ValidationSummary />
                     </MudText>
                 </MudPaper>
-                
             }
-            
             <MudTextField @bind-Value="keyInputModel.ApiKeyName" HelperText="Min. 5 characters" Label="API Key Name" For="@(() => keyInputModel.ApiKeyName)" />
                 <br />
                 @if (keyInputModel.Scopes != null)
                 {
-                    
                     @foreach (var scope in keyInputModel.Scopes)
                     {
                         <MudSwitch @bind-Value="scope.IsChecked" ThumbIcon="@(scope.IsChecked == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(scope.IsChecked == true ? Color.Success : Color.Error)">
@@ -99,38 +96,5 @@
         ShowMudPaper = true;
         StateHasChanged();
     }
-    // private async void Submit()
-    // {
-    //     Console.WriteLine("Submit called");
-    //     // Validate the ApiKeyName using the form's built-in validation
-
-    //     // Custom validation for Scopes
-    //     if (keyInputModel.Scopes == null || !keyInputModel.Scopes.Any(s => s.IsChecked))
-    //     {
-    //         success = false;
-    //         errorMessage = "Validation failed: at least one endpoint is required.";
-    //         return;
-    //     }
-
-    //     if (success)
-    //     {
-    //         // Handle valid submission
-    //         errorMessage = string.Empty;
-    //         _processing = true;
-    //         await Task.Delay(2000);
-    //         _processing = false;
-    //         MudDialog?.Close(DialogResult.Ok(keyInputModel));
-    //     }
-    //     else
-    //     {
-    //         // Handle validation errors
-    //         if (form != null)
-    //         {
-    //             await form.Validate();
-    //         }
-    //     }
-       
-    // }
-
     private void Cancel() => MudDialog?.Cancel();
 }

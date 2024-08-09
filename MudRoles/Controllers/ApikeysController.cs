@@ -22,13 +22,26 @@ namespace MudRoles.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,User")] // Both Admin and User roles can access this endpoint
         public async Task<ActionResult<IEnumerable<ApiKey>>> GetApiKeys()
-        {
-            var apiKeys = await _context.ApiKeys.ToListAsync();
+        {// Ensure the user is authenticated
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return Unauthorized();
+            }
+            // Get the current user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Retrieve the ApplicationUser from the database
+            var user = await _applicationContext.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            var apiKeys = await _context.ApiKeys.Where(x=> x.UserId == user.Id).ToListAsync();
             return Ok(apiKeys);
         }
         // GET: api/Scopes
         [HttpGet("Scopes")]
-        [Authorize(Roles = "Admin,User")] // Both Admin and User roles can access this endpoint
+        // Both Admin and User roles can access this endpoint
         public async Task<ActionResult<IEnumerable<Scope>>> GetScopes()
         {
             var scocpes = ScopeFetcher.GetAllRoutes();
@@ -125,13 +138,25 @@ namespace MudRoles.Controllers
             var apiKey = await _context.ApiKeys.FindAsync(id);
             if (apiKey == null)
             {
-                return NotFound();
+                return NotFound("API key not found");
             }
 
             _context.ApiKeys.Remove(apiKey);
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+        public async Task<ApiKey> GetApiKeyFromFullKey(string fullKey)
+        {
+            var splitKey = fullKey.Split('-');
+            if (splitKey.Length != 2)
+            {
+                return null;
+            }
+            var keyPrefix = splitKey[0];
+            var key = splitKey[1];
+
+            return await _context.ApiKeys.FirstOrDefaultAsync(apiKey => apiKey.KeyPrefix == keyPrefix && apiKey.Key == key);
         }
 
         private bool ApiKeyExists(int id)

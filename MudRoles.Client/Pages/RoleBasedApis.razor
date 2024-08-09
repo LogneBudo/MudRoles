@@ -1,17 +1,107 @@
 ﻿@page "/roleapi"
 <PageTitle>Roles & APIs</PageTitle>
 
-<MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
-        <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-            <MudText Typo="Typo.h1">Role based Secure APIs</MudText>
-        </MudPaper>
-    </MudSection>
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="1">
-
-    </MudSection>
-</MudPage>
-
+<MudPaper Elevation="2" Class="d-flex flex-column flex-wrap align-center justify-center">
+    <MudIconButton Icon="@Icons.Material.Filled.Api" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Typo="Typo.h2">Control API's with <span style="font-weight:600" class="--mud-palette-primary">Roles</span></MudText>
+    <MudText Typo="Typo.h3">Key Steps to Set Up Controllers in Blazor</MudText>
+    <br />
+</MudPaper>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 1: Add Controllers support</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    Understanding Controllers.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Roles</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    <ul>
+                        <li><b>Configure Services:</b>: Open the Program.cs file in the server project and add builder.Services.AddControllers(); to the service configuration. This tells the server to use controllers.</li>
+                        <li><b>Configure Endpoints:</b>: In the same file, add app.MapControllers(); to the endpoint configuration. This maps the controller routes so they can be accessed.</li>
+                    </ul>
+                    
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Why are Roles important</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    Roles help to organize and manage what different people can do within a system. By assigning roles,
+                    you can control access to certain features and ensure that only authorized individuals
+                    can perform specific actions.
+                    <br />
+                    Here's a simple analogy:
+                    <br /><br />
+                    <ul>
+                        <li><b>Role</b>: Job title (e.g., student, teacher, principal)</li>
+                        <li><b>Permissions</b>: Actions that the person in that role is allowed to perform</li>
+                    </ul>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 2: Create a Controllers Folder</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    That's child play!
+                </MudText>
+                <br />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 680px;">
+                <MudText Class="flex-auto" Typo="Typo.h4">Step 3: Set Up HttpClient</MudText>
+                <br /><br />
+                <MudText Class="flex-auto" HtmlTag="p" Typo="Typo.body1">
+                    That's client side its your tool to call the API EndPoints.
+                </MudText>
+                <br />
+                <MudText Class="flex-auto" Typo="Typo.h6">Persistence Revalidation with Identity Core</MudText>
+                <MudText HtmlTag="p" Class="flex-auto" Typo="Typo.body2">
+                    Open the Program.cs file in the client project.
+                    Configure HttpClient to use the server’s base address 
+                    by adding:<a href="#"></a>
+                    <br />
+                    <br />
+                    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });.
+                    <br />
+                    <br />
+                </MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 940px;">
+                <MudText Class="flex-auto" Typo="Typo.body2">
+                    <h5>Why These Steps Are Important</h5>
+                    <br />
+                    <p>
+                        <b>Controller Support:</b> Adding AddControllers and MapControllers ensures the server can handle API requests.
+                    </p>
+                    <br />
+                    <p>
+                        <b>HttpClient Setup:</b> Configuring HttpClient in the client project allows it to communicate with the server.
+                    </p>
+                    <br />
+                    <p>
+                        <b>Creating Controllers:</b> Controllers enable you to define API endpoints that the client can call to interact with the server.
+                    </p>
+                    <br />
+                    <p>
+                        By following these key steps, you can set up controller support in your Blazor WebAssembly project, allowing you to build and add your first controller.
+                    </p>
+                    <br />
+                        I hope this helps! If you have any more questions or need further clarification, feel free to ask.
+                    
+                    <br />
+                    <br />
+                    <MudLink Href="https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-8.0&tabs=visual-studio" Target="_blank">Microsoft Tutorial: Create a web API with ASP.NET Core</MudLink>
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 @code {
 
 }

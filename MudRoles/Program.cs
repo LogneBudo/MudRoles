@@ -14,6 +14,8 @@ using MudRoles.Components.Account;
 using MudRoles.Data;
 using MudRoles.Infrastructure.Api;
 using MudExtensions.Services;
+using MudRoles.Infrastructure.MiddleWare;
+using MudRoles.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
@@ -58,6 +60,8 @@ builder.Services.AddDbContext<ApiKeyDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddValidatorsFromAssemblyContaining<KeyInputModelValidator>();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,7 +94,8 @@ app.MapAdditionalIdentityEndpoints();
 //Get scopes initialization
 var actionDescriptorCollectionProvider = app.Services.GetRequiredService<IActionDescriptorCollectionProvider>();
 ScopeFetcher.Initialize(actionDescriptorCollectionProvider);
-
+app.UseMiddleware<ApiKeyMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
 // Seed the database with default roles and users 
 // Uncomment this code to seed the database with default roles and users
 

@@ -1,16 +1,52 @@
 ﻿@page "/apikeysforendpoints"
 <PageTitle>API Keys</PageTitle>
-
-<MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
-        <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-            <MudText Typo="Typo.h1">API Keys for endpoints</MudText>
-        </MudPaper>
-    </MudSection>
-    <MudSection Column="1" Class="pb-6" ColSpan="6" Row="2" RowSpan="1">
-
-    </MudSection>
-</MudPage>
+<MudPaper Elevation="2" Class="d-flex flex-column flex-wrap align-center justify-center">
+    <MudIconButton Icon="@Icons.Material.Filled.Key" Color="Color.Primary" Size="Size.Large" />&nbsp;<MudText Typo="Typo.h2">API <span style="font-weight:600" class="--mud-palette-primary">Keys</span> for Endpoints</MudText>
+    <MudText Typo="Typo.h3">What the <span style="font-weight:600" class="--mud-palette-primary">Hell</span> is it?</MudText>
+    <br />
+</MudPaper>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudText Typo="Typo.h3">What is an API Key?</MudText>
+            <MudText Typo="Typo.body1">
+                <br />
+                <br />
+                Think of an API key as a <strong>special password</strong> that allows one software application to talk to another. 
+                <br />
+                <br />
+                Here's a simple breakdown:
+                <br />
+                <br />
+            </MudText>
+            <MudList T="Object">
+                <MudListItem>
+                    <MudText Typo="Typo.body1"><strong>API</strong>: Stands for Application Programming Interface. It's like a waiter in a restaurant who takes your order (request) and brings back your food (response) from the kitchen (server).</MudText>
+                </MudListItem>
+                <MudListItem>
+                    <MudText Typo="Typo.body1"><strong>Key</strong>: This is a unique code that identifies and authenticates you. It's like having a VIP pass that lets you access certain areas or services aka Scopes.
+                        <br />
+                        <br />
+                    </MudText>
+                </MudListItem>
+            </MudList>
+            <MudText Typo="Typo.h3">Why are API keys important?</MudText>
+            <br />
+            <br />
+            <MudList T="Object">
+                <MudListItem>
+                    <MudText Typo="Typo.body1"><strong>Security</strong>: They help ensure that only authorized users can access the API.</MudText>
+                </MudListItem>
+                <MudListItem>
+                    <MudText Typo="Typo.body1"><strong>Tracking</strong>: They allow the service provider to monitor usage and prevent abuse, receive stastical data of usage, helps in planning server infrastructure scaling.</MudText>
+                </MudListItem>
+                <MudListItem>
+                    <MudText Typo="Typo.body1"><strong>Control</strong>: They can limit the number of requests you can make, ensuring fair use.</MudText>
+                </MudListItem>
+            </MudList>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
 
