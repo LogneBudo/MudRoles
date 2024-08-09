@@ -2,12 +2,14 @@
 
 ![Static Badge](https://img.shields.io/badge/.Net%208-MudBlazor-brightgreen?style=for-the-badge)   ![GitHub License](https://img.shields.io/github/license/LogneBudo/MudRoles?style=for-the-badge&logo=dotnet&logoColor=white&label=License%20%C2%A9%20Codemoa&labelColor=7E6FFF&link=https%3A%2F%2Fgithub.com%2FLogneBudo%2FMudRoles%2Fblob%2Fmaster%2FLICENSE.txt) ![GitHub repo size](https://img.shields.io/github/repo-size/LogneBudo/MudRoles?style=for-the-badge)
 
+## **MudBlazor Template**: `dotnet new mudblazor --interactivity Auto --auth Individual --all-interactive`, installed with Secure API based on roles.
+
 This project includes an API management interface.
 
 ![API Management](MudRoles/wwwroot/apimgt.png)
 
 ## Overview
-MMudRoles is a sample project demonstrating the use of Blazor with Identity and roles, integrated with MudBlazor for UI components.
+MudRoles is a sample project demonstrating the use of Blazor with Identity and roles, integrated with MudBlazor for UI components.
 This project includes a Web API protected by role-based authorization and showcases how to access APIs based on roles. 
 It also features API key management, rate limiting, and user secrets for secure configuration.
 The application includes dedicated pages explaining various setups:
