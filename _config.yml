@@ -1,0 +1,5 @@
+title: MudRoles
+description: API Keys Management
+baseurl: "/MudRoles" # the subpath of your site
+url: "https://lognebudo.github.io" # the base hostname & protocol for your site
+favicon: /MudRoles/favicon.ico
