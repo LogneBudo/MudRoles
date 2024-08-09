@@ -3,6 +3,7 @@
 @using System.Net.Http.Json
 @inject HttpClient HttpClient
 @inject IDialogService DialogService
+@inject IConfiguration Configuration
 @attribute [Authorize]
 <PageTitle>Api Management</PageTitle>
 
@@ -110,7 +111,7 @@
         /* Change this to your desired font weight */
 </style>
 @code {
-    private string apiKey = "Akee-CP-3SHN-LZWZ-N7T5-HKGZ-RK5A-4KYX-VLON-PIWS-RAVA-HVXV-JFPD-GUS5-DAQA";
+    private string apiKey = "";
     private List<ApiKey> userApiKeys = new();
     private string errorMessage = string.Empty;
     private List<Scope> scopes = new();
@@ -120,8 +121,19 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        await LoadScopes();
-        await LoadApiKeys();
+        try
+        {
+            var response = await HttpClient.GetAsync("api/configuration/apikey");
+            response.EnsureSuccessStatusCode();
+            apiKey = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Fetched API Key: {apiKey}");
+            await LoadScopes();
+            await LoadApiKeys();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error fetching API key: {ex.Message}";
+        }
     }
     private Func<ApiKey, string> _cellStyleFunc => x =>
     {

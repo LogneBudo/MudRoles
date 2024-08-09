@@ -17,7 +17,7 @@ namespace MudRoles.Infrastructure.MiddleWare
         public async Task InvokeAsync(HttpContext context)
         {
             // Check if the request path requires API key validation
-            if (context.Request.Path.StartsWithSegments("/api"))
+            if (context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/api/configuration"))
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {

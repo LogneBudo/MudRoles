@@ -16,7 +16,7 @@ namespace MudRoles.Infrastructure.MiddleWare
         public async Task InvokeAsync(HttpContext context)
         {
             // Check if the request path starts with /api
-            if (context.Request.Path.StartsWithSegments("/api"))
+            if (context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/api/configuration"))
             {
                 var apiKey = context.Request.Headers["ApiKey"].ToString();
 

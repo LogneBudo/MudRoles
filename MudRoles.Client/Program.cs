@@ -8,7 +8,7 @@ using MudRoles.Client.Components;
 using FluentValidation;
 using MudExtensions.Services;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
+var movieApiKey = builder.Configuration["ApiKey"];
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServicesWithExtensions(options =>
 {

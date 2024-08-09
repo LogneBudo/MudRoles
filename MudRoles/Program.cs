@@ -18,6 +18,9 @@ using MudRoles.Infrastructure.MiddleWare;
 using MudRoles.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddUserSecrets<Program>();
+var movieApiKey = builder.Configuration["ApiKey"];
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
 
 // Add MudBlazor services
