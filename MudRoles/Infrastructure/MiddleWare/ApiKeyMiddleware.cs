@@ -3,17 +3,30 @@ using MudRoles.Infrastructure.Services;
 
 namespace MudRoles.Infrastructure.MiddleWare
 {
+    /// <summary>
+    /// Middleware to validate API keys for incoming HTTP requests.
+    /// </summary>
     public class ApiKeyMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiKeyMiddleware"/> class.
+        /// </summary>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="serviceProvider">The service provider to resolve dependencies.</param>
         public ApiKeyMiddleware(RequestDelegate next, IServiceProvider serviceProvider)
         {
             _next = next;
             _serviceProvider = serviceProvider;
         }
 
+        /// <summary>
+        /// Invokes the middleware to validate the API key.
+        /// </summary>
+        /// <param name="context">The HTTP context of the current request.</param>
+        /// <returns>A task that represents the completion of request processing.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
             // Check if the request path requires API key validation

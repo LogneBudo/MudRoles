@@ -1,9 +1,0 @@
-﻿@MudRoles_HostAddress = https://localhost:7140
-
-GET {{MudRoles_HostAddress}}/api/apikeys
-
-###
-
-GET {{MudRoles_HostAddress}}/api/apikeys/Scopes
-
-###

@@ -158,7 +158,7 @@ namespace MudRoles.Controllers
 
             return await _context.ApiKeys.FirstOrDefaultAsync(apiKey => apiKey.KeyPrefix == keyPrefix && apiKey.Key == key);
         }
-
+        // TODO: Implement a method to Renew the API key
         private bool ApiKeyExists(int id)
         {
             return _context.ApiKeys.Any(e => e.Id == id);

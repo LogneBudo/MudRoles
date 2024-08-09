@@ -1,14 +1,35 @@
+
 using Microsoft.AspNetCore.Identity;
 
 namespace MudRoles.Data;
 
-// Add profile data for application users by adding properties to the ApplicationUser class
+/// <summary>  
+/// Represents an application user with additional profile data.  
+/// </summary>  
 public class ApplicationUser : IdentityUser
 {
+    /// <summary>  
+    /// Gets or sets the first name of the user.  
+    /// </summary>  
     public required string FirstName { get; set; }
+
+    /// <summary>  
+    /// Gets or sets the last name of the user.  
+    /// </summary>  
     public required string LastName { get; set; }
+
+    /// <summary>  
+    /// Gets or sets the title of the user.  
+    /// </summary>  
     public string? Title { get; set; }
+
+    /// <summary>  
+    /// Gets or sets a value indicating whether the user prefers a dark theme.  
+    /// </summary>  
     public bool IsDarkTheme { get; set; }
+
+    /// <summary>  
+    /// Gets or sets the avatar ID of the user.  
+    /// </summary>  
     public string? AvatarId { get; set; }
 }
-
