@@ -2,6 +2,8 @@
 @using MudRoles.Client.Models
 @using System.Net.Http.Json
 @inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject IConfiguration Configuration
 @attribute [Authorize]
@@ -23,30 +25,29 @@
      * Voila this is working
      * (C# multi-line comment) */
 }
-<MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
-         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+<MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
     <MudTabPanel Text="Vault">
         <MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
-        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys">
+        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys.Where(x=>x.ExpirationDate > DateTime.UtcNow).ToList()">
             <Columns>
                 <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
                 <TemplateColumn Title="Key">
                     <CellTemplate Context="cellContext">
                         @if (cellContext.Item.Key != null)
                         {
-                            <MudFab Size="Size.Small" EndIcon="@Icons.Material.Filled.VisibilityOff" Label="@($"{cellContext.Item.KeyPrefix}...{cellContext.Item.Key.Substring(cellContext.Item.Key.Length - 5)}")" OnClick="@(() => ToggleKeyVisibility(cellContext.Item))" />
+                            <MudButton Variant="Variant.Filled" OnClick="@(cellContext.Item != null ? (() => HandleKeyButtonClick(cellContext.Item)) : null)" EndIcon="@(cellContext.Item.IsKeyVisible ? Icons.Material.Filled.ContentCopy : Icons.Material.Filled.VisibilityOff)">@GetMaskedKey(cellContext.Item)</MudButton>
                         }
                     </CellTemplate>
                 </TemplateColumn>
+
                 <TemplateColumn Title="Scopes">
                     <CellTemplate Context="cellContext">
                         @foreach (var scope in cellContext.Item.Scopes)
                         {
-                            <MudChip Color="Color.Primary" Icon="@Icons.Material.Filled.Api" Variant="Variant.Outlined" Class="m-1">
-                                @($"{scope.Controller}")
-                            </MudChip>
-                            <MudChip Size="Size.Small" Color="Color.Dark">  @($"{scope.Verb}") </MudChip>
-                            <MudChip  Size="Size.Small" Color="Color.Primary">  @($"{scope.Endpoint}") </MudChip><br />
+                            <div class="d-flex">
+                                <MudChip Style="@GetVerbColor(scope.Verb ?? "")" Label="true">@($"{scope.Verb}")</MudChip>
+                                <span style="font-weight:600!important" class="align-content-center">&nbsp;&nbsp; @($"{scope.Endpoint?.ToLowerInvariant()}")</span>
+                            </div>
                         }
                     </CellTemplate>
                 </TemplateColumn>
@@ -73,37 +74,80 @@
             </NoRecordsContent>
         </MudDataGrid>
         <br />
-        <br />
-        <br />
-        <MudText Typo="Typo.h5" GutterBottom="true">Recently Expired</MudText>
-        <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys.Where(x => x.ExpirationDate < DateTime.Now).ToList()">
+        <br />        
+    </MudTabPanel>
+    <MudTabPanel Text="Expired Keys">
+        <MudText>Content Store</MudText>
+            <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys.Where(x=>x.ExpirationDate < DateTime.UtcNow).ToList()">
             <Columns>
-                <PropertyColumn Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
-                <PropertyColumn Property="x => x.Key" />
-                <PropertyColumn Property="x => x.CreationDate" Title="Created" />
-                <PropertyColumn Property="x => x.ExpirationDate.ToShortDateString()" Title="Expires" />
-                <PropertyColumn Property="x => x.Scopes" />
-                <TemplateColumn CellClass="d-flex justify-end">
-                    <CellTemplate>
+                <PropertyColumn HeaderClass="font-bold" Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
+                <TemplateColumn Title="Key">
+                    <CellTemplate Context="cellContext">
+                        @if (cellContext.Item.Key != null)
+                        {
+                            <MudFab Size="Size.Small"
+                                    EndIcon="@(cellContext.Item.IsKeyVisible ? Icons.Material.Filled.ContentCopy : Icons.Material.Filled.VisibilityOff)"
+                                    Label="@GetMaskedKey(cellContext.Item)"
+                                    OnClick="@(() => HandleKeyButtonClick(cellContext.Item))" />
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn Title="Scopes">
+                    <CellTemplate Context="cellContext">
+                        @foreach (var scope in cellContext.Item.Scopes)
+                        {
+                            <div class="d-flex">
+                                <MudChip Style="@GetVerbColor(scope.Verb ?? "")" Label="true">@($"{scope.Verb}")</MudChip>
+                                <span style="font-weight:600!important" class="align-content-center">&nbsp;&nbsp; @($"{scope.Endpoint?.ToLowerInvariant()}")</span>
+                            </div>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Created">
+                    <CellTemplate Context="cellContext">
+                        @cellContext.Item.CreationDate.ToFormattedString("yyyy-MM-dd HH:mm")
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Expires">
+                    <CellTemplate Context="cellContext">
+                        @cellContext.Item.ExpirationDate.ToTimeSpanString(cellContext.Item.CreationDate)
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn CellClass="justify-end">
+                    <CellTemplate Context="cellContext">
                         <MudStack Row>
-                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Renew</MudButton>
+                            <MudButton Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(()=> DeleteKey(cellContext.Item.Id))">Delete</MudButton>
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>
             <NoRecordsContent>
-                <MudText>No Expired keys available</MudText>
+                <MudText>0 Expired Key Available</MudText>
             </NoRecordsContent>
         </MudDataGrid>
-    </MudTabPanel>
-    <MudTabPanel Text="Expiered Keys">
-        <MudText>Content Store</MudText>
     </MudTabPanel>
     <MudTabPanel Text="Users">
         <MudText>Content Users</MudText>
     </MudTabPanel>
 </MudTabs>
 <br />
+<script>
+    window.copyToClipboard = async function (text) {
+        if (document.hasFocus()) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                return false;
+            }
+        } else {
+            console.warn('Document is not focused');
+            return false;
+        }
+    }
+</script>
 <style>
     .mud-table-head {
         font-weight: 500;
@@ -115,9 +159,14 @@
     private List<ApiKey> userApiKeys = new();
     private string errorMessage = string.Empty;
     private List<Scope> scopes = new();
+    private CancellationTokenSource? _cancellationTokenSource;
     private async Task DoShit()
     {
         await Task.Yield();
+    }
+    void CloseChip()
+    {
+        // Code..
     }
     protected override async Task OnInitializedAsync()
     {
@@ -135,6 +184,34 @@
             errorMessage = $"Error fetching API key: {ex.Message}";
         }
     }
+    private string GetMaskedKey(ApiKey apiKey)
+    {
+        if (apiKey.IsKeyVisible)
+        {
+            return apiKey.KeyPrefix + apiKey.Key ?? string.Empty;
+        }
+        return $"{apiKey.KeyPrefix}...{apiKey.Key?.Substring(apiKey.Key.Length - 5)}";
+    }
+
+    private void ToggleKeyVisibility(ApiKey apiKey)
+    {
+        apiKey.IsKeyVisible = !apiKey.IsKeyVisible;
+        StateHasChanged();
+    }
+
+    private async Task CopyToClipboard(string key)
+    {
+        var success = await JSRuntime.InvokeAsync<bool>("copyToClipboard", key);
+        if (success)
+        {
+            Snackbar.Add("API Key copied to clipboard", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to copy API Key. Ensure the document is focused.", Severity.Error);
+        }
+    }
+
     private Func<ApiKey, string> _cellStyleFunc => x =>
     {
         string style = "font-weight:bold";
@@ -179,10 +256,27 @@
     }
     private async Task DeleteKey(int apiKeyId)
     {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to delete this key?" },
+            { "ButtonText", "Yes" },
+            { "Color", Color.Error }
+        };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirm Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (result.Canceled)
+        {
+            return; // User canceled the delete action
+        }
+
         try
         {
             var response = await HttpClient.DeleteAsync($"api/apikeys/{apiKeyId}");
             response.EnsureSuccessStatusCode();
+            Snackbar.Add("Key successfully deleted!", Severity.Success);
+            await LoadApiKeys();
         }
         catch (HttpRequestException ex)
         {
@@ -229,9 +323,62 @@
         }
         StateHasChanged();
     }
-    private void ToggleKeyVisibility(ApiKey apiKey)
+    public static string GetVerbColor(string verb)
     {
-        apiKey.IsKeyVisible = !apiKey.IsKeyVisible;
+        return verb.ToUpperInvariant() switch
+        {
+            "POST" => "font-weight:bold;width:150px;background-color:" + VerbColors.POST + ";",
+            "GET" => "font-weight:bold;width:150px;background-color:" + VerbColors.GET + ";",
+            "DELETE" => "font-weight:bold;width:150px;background-color:" + VerbColors.DELETE + ";",
+            "HEAD" => "font-weight:bold;width:150px;background-color:" + VerbColors.HEAD + ";",
+            "OPTIONS" => "font-weight:bold;width:150px;background-color:" + VerbColors.OPTIONS + ";",
+            "PATCH" => "font-weight:bold;width:150px;background-color:" + VerbColors.PATCH + ";",
+            "PUT" => "font-weight:bold;width:150px;background-color:" + VerbColors.PUT + ";",
+            _ => "#000000" // Default color if verb is not recognized
+        };
+    }
+    private async Task HandleKeyButtonClick(ApiKey apiKey)
+    {
+        if (apiKey.IsKeyVisible)
+        {
+            // If the key is already visible, copy it to the clipboard
+            await CopyToClipboard(apiKey.Key);
+            // Cancel any existing timer
+            _cancellationTokenSource?.Cancel();
+            // Revert the key visibility immediately
+            ToggleKeyVisibility(apiKey);
+        }
+        else
+        {
+            // If the key is not visible, toggle its visibility
+            ToggleKeyVisibility(apiKey);
+            // Start a timer to revert the visibility after 15 seconds
+            _cancellationTokenSource = new CancellationTokenSource();
+            var token = _cancellationTokenSource.Token;
+            try
+            {
+                await Task.Delay(8000, token);
+                if (!token.IsCancellationRequested)
+                {
+                    ToggleKeyVisibility(apiKey);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // Task was canceled, do nothing
+            }
+        }
+    }
+
+    public class VerbColors
+    {
+        public const string POST = "#90BE4C";
+        public const string GET = "#83BDEB";
+        public const string DELETE = "#DC626D";
+        public const string HEAD = "#3595DE";
+        public const string OPTIONS = "#9184EE";
+        public const string PATCH = "#4CB4B7";
+        public const string PUT = "#F2C661";
     }
     internal class ApiKey
     {
@@ -247,4 +394,5 @@
         public List<Scope> Scopes { get; set; } = new();
         public bool IsKeyVisible { get; set; } = false; // New property to track visibility
     }
+}
 }

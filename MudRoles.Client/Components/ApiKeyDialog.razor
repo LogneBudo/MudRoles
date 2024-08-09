@@ -1,5 +1,6 @@
 ﻿@using MudBlazor
 @using FluentValidation
+@using MudRoles.Client.Pages
 @using static MudRoles.Client.Pages.ApiMgt
 <EditForm Model="@keyInputModel" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
     <MudDialog Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface py-10" ActionsClass="dialog-background-surface">
@@ -20,13 +21,9 @@
                     @foreach (var scope in keyInputModel.Scopes)
                     {
                         <MudSwitch @bind-Value="scope.IsChecked" ThumbIcon="@(scope.IsChecked == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(scope.IsChecked == true ? Color.Success : Color.Error)">
-                            <MudChip T="string" Icon="@Icons.Material.Filled.Api" IconColor="Color.Success">@scope.Controller</MudChip>
-                            <MudBadge Icon="@Icons.Material.Filled.Lock" Color="Color.Error" Overlap="true" Bordered="true" Class="mx-6 my-4">
-                                <MudButton Color="@(@scope.Verb == "GET" ? Color.Success : Color.Warning)" Variant="Variant.Filled" DropShadow="false">@scope.Verb</MudButton>
-                            </MudBadge>
-                            <MudBadge Origin="Origin.TopLeft" Icon="@Icons.Material.Filled.OpenInBrowser" Color="Color.Success" Overlap="true" Bordered="true" Class="mx-6 my-4">
-                                <MudButton Color="Color.Surface" Variant="Variant.Filled" DropShadow="false"><MudText>@(scope.Endpoint?.ToLower())</MudText></MudButton>
-                            </MudBadge>
+                        <MudChip T="string" Style="@ApiMgt.GetVerbColor(scope.Verb ?? "")" Label="true">@scope.Verb</MudChip>
+                                <span style="font-weight:600!important" class="align-content-center">&nbsp;&nbsp; @($"{scope.Endpoint?.ToLowerInvariant()}")</span>
+
                         </MudSwitch>
                     }
                     <ValidationMessage For="@(() => keyInputModel.Scopes)" />
@@ -84,10 +81,10 @@
     {
         keyInputModel.Scopes = Scopes ?? new List<Scope>();
     }
-    private void OnValidSubmit(EditContext context)
+    private async void OnValidSubmit(EditContext context)
     {
         _processing = true;
-        Task.Delay(2000);
+        await Task.Delay(2000);
         _processing = false;
         MudDialog?.Close(DialogResult.Ok(keyInputModel));
     }

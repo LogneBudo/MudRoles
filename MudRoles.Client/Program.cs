@@ -7,13 +7,18 @@ using MudBlazor.Extensions;
 using MudRoles.Client.Components;
 using FluentValidation;
 using MudExtensions.Services;
+using MudBlazor;
+using Microsoft.Extensions.Options;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-var movieApiKey = builder.Configuration["ApiKey"];
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServicesWithExtensions(options =>
 {
     options.PopoverOptions.ThrowOnDuplicateProvider = false;
+    options.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
+    options.SnackbarConfiguration.PreventDuplicates = true;
 });
+
+
 builder.Services.AddMudExtensions();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddAuthorizationCore();

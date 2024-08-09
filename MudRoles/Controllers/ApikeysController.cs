@@ -132,7 +132,7 @@ namespace MudRoles.Controllers
 
         // DELETE: api/ApiKeys/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Only Admin role can access this endpoint
+        [Authorize(Roles = "Admin,User")] // Only Admin role can access this endpoint
         public async Task<IActionResult> DeleteApiKey(int id)
         {
             var apiKey = await _context.ApiKeys.FindAsync(id);

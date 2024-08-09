@@ -1,0 +1,26 @@
+﻿<MudDialog Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface py-10" ActionsClass="dialog-background-surface">
+    <DialogContent>
+        <MudText Typo="Typo.h6">@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Confirm">Yes</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">No</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public string ContentText { get; set; } = "Are you sure?";
+    [Parameter] public string ButtonText { get; set; } = "Yes";
+    [Parameter] public Color Color { get; set; } = Color.Default;
+
+    private void Confirm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
