@@ -7,15 +7,38 @@ This project includes an API management interface.
 ![API Management](MudRoles/wwwroot/apimgt.png)
 
 ## Overview
-MudRoles is a sample project demonstrating the use of Blazor with Identity and roles, integrated with MudBlazor for UI components. This project includes a Web API protected by role-based authorization and showcases how to filter data based on user roles.
+MMudRoles is a sample project demonstrating the use of Blazor with Identity and roles, integrated with MudBlazor for UI components.
+This project includes a Web API protected by role-based authorization and showcases how to access APIs based on roles. 
+It also features API key management, rate limiting, and user secrets for secure configuration.
+The application includes dedicated pages explaining various setups:
 
+- **Home**: Overview of the application.
+- **Authentication**: User registration and login.
+- **Blazor Identity**: Integration of Blazor with ASP.NET Core Identity.
+- **Role Management**: Assigning and managing user roles.
+- **Role-Based APIs**: Roles implementation explained in APIs.
+- **API Key Management**: Generating and managing API keys.
+- **API Keys for Endpoints**: Managing API keys for specific endpoints.
+- **API Management**: Comprehensive API management interface.
+- **Rate Limiting**: Explanation and configuration of rate limiting.
+- **User Secrets**: Securely managing sensitive configuration data.
+- **Endpoint Examples**: Endpoint with all HTTP verbs and their explanations.
+- **Dependency Injection**: Explanation of dependency injection in the project.
+- **Code Beam Extensions**: Describing the usage of code beam extensions in the project.
+- **MudBlazor Components**: Overview of MudBlazor components used in the project.
+- **Working with MudBlazor**: MudBlazor extensions and their usage.
+- **MudBlazor Static Controls**: Static controls for account pages.
+- **Code Highlighting**: Code highlighting with Highlight.js.
+- **Dashboard**: Overview of user activities and statistics.
+- **User Profile**: Managing user profile information.
+- **Settings**: Application settings and configurations.
 
 ## Features
 - **Blazor Server**: Interactive web UI with Blazor.
 - **MudBlazor**: Modern UI components for Blazor.
 - **ASP.NET Core Identity**: User authentication and role management.
 - **Role-Based Authorization**: Admin and User roles with specific access permissions.
-- **Web API**: Protected endpoints with role-based filtering.
+- **Web API**: Protected endpoints with role-based filtering, API keys and Rate-Limiting.
 
 ## Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
@@ -39,8 +62,23 @@ dotnet restore
 
 3. **Update the database**:
 
+Api key database setup:
+
 ```
-dotnet ef database update
+dotnet ef database update --context ApiKeyDbContext
+```
+
+Application database setup:
+
+```
+dotnet ef database update --context ApplicationDbContext
+```
+
+**If you use the Package Manager Console**:
+
+```
+Update-Database -Context ApiKeyDbContext
+Update-Database -Context ApplicationDbContext
 ```
 
 ### Configuration
@@ -53,8 +91,7 @@ dotnet ef database update
 dotnet run
 ```
 
-
-2. **Open in browser**: Navigate to `https://localhost:5001` to see the application in action.
+2. **Open in browser**: Navigate to `https://localhost:[YourPortNumber]` to see the application in action.
 
 ## Project Structure
 - **Client**: Blazor Server application with MudBlazor components.
@@ -73,6 +110,13 @@ Upon registration, new users are automatically assigned the "User" role. The "Ad
 - [ASP.NET Core Identity](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity)
 - [Blazor Documentation](https://docs.microsoft.com/en-us/aspnet/core/blazor/)
 - [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/)
+
+### Additional Resources
+- [Blazor Identity UI (Individual Accounts)](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/?view=aspnetcore-8.0&tabs=visual-studio#blazor-identity-ui-individual-accounts)
+- [First Web API Tutorial](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-8.0&tabs=visual-studio)
+- [Blazor Forms and Validation](https://learn.microsoft.com/en-us/aspnet/core/blazor/forms/validation?view=aspnetcore-8.0)
+- [Account Confirmation and Password Recovery](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/server/account-confirmation-and-password-recovery?view=aspnetcore-8.0)
+
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
