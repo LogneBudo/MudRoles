@@ -127,7 +127,7 @@ Upon registration, new users are automatically assigned the "User" role. The "Ad
 Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.txt) file for details.
 
 ## Contact
 For any questions or feedback, please contact [Djovani](mailto:anupjitamang@gmail.com).
