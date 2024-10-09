@@ -3,7 +3,7 @@ using MudRoles.Data;
 
 namespace MudRoles.Components.Account;
 
-internal sealed class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
+public class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
 {
     public async Task<ApplicationUser> GetRequiredUserAsync(HttpContext context)
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace MudRoles.Components.Account;
 
-internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
+public class IdentityRedirectManager(NavigationManager navigationManager)
 {
     public const string StatusCookieName = "Identity.StatusMessage";
 

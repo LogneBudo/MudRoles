@@ -153,6 +153,9 @@ namespace MudRoles.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AvatarChoice")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("AvatarId")
                         .HasColumnType("TEXT");
 
@@ -209,6 +212,9 @@ namespace MudRoles.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("UploadedAvatar")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)

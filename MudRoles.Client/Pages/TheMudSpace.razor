@@ -11,7 +11,7 @@
         <MudItem xs="6">
             <MudPaper Elevation="2" Class="pa-4">
                 <MudText Typo="Typo.h4">Custom Theme implementation</MudText>
-                <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
+                <MudTabs Elevation="2" Outlined="true" Position="MudBlazor.Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
                     <MudTabPanel Text="Explanation">
                         <MudText Typo="Typo.h5">Custom Theme implementation</MudText>
                         <MudText HtmlTag="p" Typo="Typo.body1">There are plenty of reasons to want to implement your own custom theme, 
@@ -45,26 +45,26 @@
         </MudItem>
         <MudItem xs="6">
             <MudPaper Elevation="2" Class="pa-4">
-                <MudText Typo="Typo.h4">Custom Theme implementation</MudText>
-                <MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
+                <MudText Typo="Typo.h4">Component Lifecycle</MudText>
+                <MudTabs Elevation="2" Outlined="true" Position="MudBlazor.Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6" Color="Color.Secondary">
                     <MudTabPanel Text="Explanation">
-                        <MudText Typo="Typo.h5">Custom Theme implementation</MudText>
+                        <MudText Typo="Typo.h5">Stateful reconnection after prerendering</MudText>
                         <MudText HtmlTag="p" Typo="Typo.body1">
-                            There are plenty of reasons to want to implement your own custom theme,
-                            the default theme holds a lot of the essence of best practices for designs systems, but if a neutral balanced
-                            theme doesn't suit your needs then you can implement your own theme easily in code.
-                        </MudText>
-                        <MudText HtmlTag="p" Typo="Typo.body1">
-                            Custom themes offer a handy way of implementing branding specifities if well implemented. A few things to keep in mind never try to directly change the core css
-                            files. The Theme provider and the Theme Class exposes all you need to fine tune your own theme.
+                            When prerendering on the server, a component is initially rendered statically as part of the page. 
+                            Once the browser establishes a SignalR connection back to the server, the component is rendered again 
+                            and interactive. If the OnInitialized{Async} lifecycle method for initializing the component is present, 
+                            the method is executed twice:
                             <br />
                             <br />
-                            You can expose also a ThemeService to handle things like User preferences in profile and theme options for them. You could think of having a special theme for
-                            people that are visually specificities that require a special choice of colors.
+                        </MudText>
+                        <MudText HtmlTag="ul" Typo="Typo.body1">
+                                <li>First, during prerendering on the server.</li>
+                                <li>Second, after the browser establishes a SignalR connection back to the server.</li>
                         </MudText>
                         <MudText HtmlTag="p" Typo="Typo.body1">
-                            Make sure you pick colors that have harmonies, the theme lets you set Primary, Secondary and Tertiary colors, for that you can use a service to find harmonious combinations
-                            https://colors.dopely.top/color-harmony-finder
+                            <br />
+                            <br />This can result in a noticeable change in the data displayed in the UI when the component is finally rendered. 
+                            To avoid this behavior, pass in an identifier to cache the state during prerendering and to retrieve the state after prerendering.
                         </MudText>
                     </MudTabPanel>
                     <MudTabPanel Text="Theme Code">
@@ -237,12 +237,13 @@
         };
     }
     ";
-    private string themeService = @"public class ThemeService
+    private string themeService = @"
+    public class ThemeService
     {
         private bool _isDarkMode = false;
         private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
 
-        public MudTheme CurrentTheme => _currentTheme;
+        public MudTheme CurrentTheme =&gt; _currentTheme;
 
         public void ToggleDarkMode()
         {

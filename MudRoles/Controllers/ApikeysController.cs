@@ -8,6 +8,7 @@ using MudRoles.Infrastructure.Api;
 using ApiKey = MudRoles.Data.ApiData.ApiKey;
 using MudRoles.Client.Components;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace MudRoles.Controllers
 {
@@ -146,7 +147,7 @@ namespace MudRoles.Controllers
 
             return NoContent();
         }
-        public async Task<ApiKey> GetApiKeyFromFullKey(string fullKey)
+        private async Task<ApiKey?> GetApiKeyFromFullKey(string fullKey)
         {
             var splitKey = fullKey.Split('-');
             if (splitKey.Length != 2)
@@ -158,7 +159,34 @@ namespace MudRoles.Controllers
 
             return await _context.ApiKeys.FirstOrDefaultAsync(apiKey => apiKey.KeyPrefix == keyPrefix && apiKey.Key == key);
         }
-        // TODO: Implement a method to Renew the API key
+
+
+        // PATCH: api/ApiKeys/Renew/{id}
+        [HttpPatch("Renew/{id}")]
+        [Authorize(Roles = "Admin,User")] // Both Admin and User roles can renew API keys
+        public async Task<IActionResult> RenewApiKey(int id)
+        {
+            var apiKey = await _context.ApiKeys.FindAsync(id);
+            if (apiKey == null)
+            {
+                return NotFound("API key not found");
+            }
+
+            var daysUntilExpiration = (apiKey.ExpirationDate - DateTime.UtcNow).TotalDays;
+            if (daysUntilExpiration > 30)
+            {
+                return BadRequest("Your key is still valid. Come back 30 days before expiry to renew it.");
+            }
+
+            apiKey.ExpirationDate = DateTime.UtcNow.AddYears(1); // Renew for another year
+            apiKey.Status = KeyStatus.Active;
+            _context.Entry(apiKey).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(apiKey);
+        }
+
+
         private bool ApiKeyExists(int id)
         {
             return _context.ApiKeys.Any(e => e.Id == id);

@@ -1,12 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @inject ThemeService ThemeService
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender:false))
+
 <MudThemeProvider IsDarkMode="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme)" Theme="@ThemeService.CurrentTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">CodeMoa</MudText>
         <MudToolBar>
             <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
@@ -36,8 +37,16 @@
 @code {
     private bool _drawerOpen = true;
     private bool IsDarkMode { get; set; }
+    
     private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
-
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+    }
+    private async Task HandleThemeChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
     private void DarkMode()
     {
         ThemeService.ToggleDarkMode();

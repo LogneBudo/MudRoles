@@ -12,7 +12,7 @@ using MudRoles.Data;
 
 namespace Microsoft.AspNetCore.Routing;
 
-internal static class IdentityComponentsEndpointRouteBuilderExtensions
+public static class IdentityComponentsEndpointRouteBuilderExtensions
 {
     // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
     public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
@@ -46,7 +46,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             [FromForm] string returnUrl) =>
         {
             await signInManager.SignOutAsync();
-            return TypedResults.LocalRedirect($"~/{returnUrl}");
+            return Results.Json(new { success = true, redirectUrl = $"{returnUrl}" });
         });
 
         var manageGroup = accountGroup.MapGroup("/Manage").RequireAuthorization();

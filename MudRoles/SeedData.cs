@@ -10,7 +10,7 @@ namespace MudRoles
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var logger = serviceProvider.GetRequiredService<ILogger<SeedData>>();
 
-            string[] roleNames = { "Admin", "User" };
+            string[] roleNames = ["Admin", "User"];
             IdentityResult roleResult;
 
             foreach (var roleName in roleNames)
@@ -22,13 +22,13 @@ namespace MudRoles
                     roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
                     if (!roleResult.Succeeded)
                     {
-                        logger.LogError($"Error creating role {roleName}");
+                        logger.LogError("Error creating role {RoleName}", roleName);
                     }
                 }
             }
 
             // Create demo users
-            await CreateDemoUser(userManager, "admin@example.com", "Admin123!", "Admin","rudeboyitis","Sugam","Singh",true,"Mr.");
+            await CreateDemoUser(userManager, "admin@example.com", "Admin123!", "Admin","rudeboyitis","Silver","Sargeant",true,"Mr.");
             await CreateDemoUser(userManager, "user@example.com", "User123!", "User","randomuser","John","Doe",false,"Dr");
         }
 

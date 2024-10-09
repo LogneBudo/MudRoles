@@ -209,7 +209,7 @@
     ";
     private string listOfUsers = @"
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task&lt;IActionResult&gt; GetUsers()
         {
             try
             {
@@ -223,8 +223,8 @@
         }
         ";
     private string updateUser = @"
-        [HttpPut(""id"")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateModel userModel)
+        [HttpPut(&quot;&quot;id&quot;&quot;)]
+        public async Task&lt;IActionResult&gt; UpdateUser(int id, [FromBody] UserUpdateModel userModel)
         {
             if (id != userModel.Id)
             {
@@ -244,7 +244,7 @@
         ";
     private string deleteUser = @"
         [HttpDelete(""id"")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task&lt;IActionResult&gt; DeleteUser(int id)
         {
             try
             {
@@ -259,11 +259,11 @@
         ";
     private string patchUser = @"
         [HttpPatch(""id"")]
-        public async Task<IActionResult> PatchUser(int id, [FromBody] JsonPatchDocument<UserUpdateModel> patchDoc)
+        public async Task&lt;IActionResult&gt; PatchUser(int id, [FromBody] JsonPatchDocument&lt;UserUpdateModel&gt; patchDoc)
         {
             if (patchDoc == null)
             {
-                return BadRequest(""Invalid patch document"");
+                return BadRequest("";Invalid patch document"");
             }
 
             try
@@ -280,7 +280,7 @@
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ""Internal server error"");
+                return StatusCode(500,""Internal server error"");
             }
         }
         ";

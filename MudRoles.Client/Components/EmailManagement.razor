@@ -1,0 +1,137 @@
+﻿@page "/email-management"
+@using System.ComponentModel.DataAnnotations
+@using MudRoles.Client.Extensions.Helpers
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Email Management</h3>
+<MudText Typo="Typo.h6" GutterBottom="true">Profile</MudText>
+<br />
+<br />
+<MudGrid Spacing="2">
+    <MudItem xs="6">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">The Story Book</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>This day everything happened.</MudText>
+                <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="6">
+        <MudGrid Spacing="2">
+             
+        @if (isLoading)
+        {   
+            <MudItem md="12">
+            <p>Loading...</p>
+            </MudItem>
+        }
+        else
+        {
+            <MudItem md="12">
+                <MudTextField Margin="Margin.Dense" Disabled="true" Label="Current Email" Variant="Variant.Outlined" For="@(() => email)" Typo="Typo.h6" @bind-Value="@email" />
+            </MudItem>
+            <MudItem md="12">
+                    <MudCheckBox @bind-Value="isEmailConfirmed" Color="Color.Primary">Email Confirmed</MudCheckBox>
+            </MudItem>
+            <EditForm class="pl-2" style="width:100%" Model="updateEmailModel" OnValidSubmit="HandleUpdateEmail">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <MudItem md="12">
+                    <MudTextField Margin="Margin.Dense" Label="@DisplayNameHelper.GetDisplayName(() => updateEmailModel.NewEmail)" Variant="Variant.Outlined" For="@(() => updateEmailModel.NewEmail)" Typo="Typo.h6" @bind-Value="updateEmailModel.NewEmail" />
+                </MudItem>
+                <MudItem md="12">
+                    &nbsp;
+                </MudItem>
+                <MudItem md="12">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true" ButtonType="ButtonType.Submit">Update Email</MudButton>
+                </MudItem>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <p>@message</p>
+            }
+        }
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private bool isLoading = true;
+    private string email = string.Empty;
+    private bool isEmailConfirmed = false;
+    private UpdateEmailModel updateEmailModel = new UpdateEmailModel();
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmail();
+    }
+
+    private async Task LoadEmail()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<EmailResponse>("api/Auth/email");
+            if (response != null)
+            {
+                email = response.Email;
+                isEmailConfirmed = response.IsEmailConfirmed;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error loading email: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleUpdateEmail()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Auth/update-email", updateEmailModel);
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Confirmation link to change email sent. Please check your email.";
+            }
+            else
+            {
+                message = "Error updating email.";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error updating email: {ex.Message}";
+        }
+    }
+
+    public class EmailResponse
+    {
+        public string Email { get; set; } = string.Empty;
+        public bool IsEmailConfirmed { get; set; }
+    }
+
+    public class UpdateEmailModel
+    {
+        [Required]
+        [Display(Name = "New Email")]
+        [EmailAddress]
+        public string NewEmail { get; set; } = string.Empty;
+    }
+}

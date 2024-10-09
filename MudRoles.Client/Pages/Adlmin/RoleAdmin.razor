@@ -1,0 +1,103 @@
+﻿@page "/admin/roleadmin"
+@inject HttpClient HttpClient
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Role Management</PageTitle>
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h3" GutterBottom="true">Roles Management</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Error" GutterBottom="true">Administrators only section</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<br />
+<MudText Typo="Typo.h5" GutterBottom="true">Roles</MudText>
+<MudDataGrid T="RoleItem" Hover="true" Items="@Roles">
+    <Columns>
+        <PropertyColumn HeaderClass="font-bold" Property="x => x.Id" />
+        <PropertyColumn HeaderClass="font-bold" Property="x => x.RoleName" />
+        <PropertyColumn HeaderClass="font-bold" Property="x => x.NormalizedName" />
+        <TemplateColumn Title="Actions">
+            <CellTemplate Context="cellContext">
+                <MudStack Row>
+                    <MudButton Variant="@Variant.Filled" Color="@Color.Error" OnClick="@(()=> DeleteRole(cellContext.Item.RoleName))">Delete</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <NoRecordsContent>
+        <MudText>No roles available</MudText>
+    </NoRecordsContent>
+</MudDataGrid>
+<br />
+<MudButton Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@AddRole">Add Role</MudButton>
+@code {
+    private List<RoleItem> Roles = new();
+    private string errorMessage = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRoles();
+    }
+    private async Task AddRole()
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = DialogService.Show<AddRoleDialog>("Add New Role", options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled && result.Data is RoleItem newRole)
+        {
+            // Set a temporary Id
+            newRole.Id = Guid.NewGuid().ToString();
+            await AddRoleToApi(newRole);
+        }
+        else
+        {
+            errorMessage = "Failed to add role: Invalid role data.";
+        }
+    }
+    private async Task AddRoleToApi(RoleItem newRole)
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync<RoleItem>("api/useradmin", newRole);
+            response.EnsureSuccessStatusCode();
+            await GetRoles();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error adding role: {ex.Message}";
+        }
+    }
+    private async Task GetRoles()
+    {
+        try
+        {
+            Roles = await HttpClient.GetFromJsonAsync<List<RoleItem>>("api/useradmin/roles") ?? new();
+            errorMessage = string.Empty; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading roles: {ex.Message}";
+        }
+    }
+    private async void DeleteRole(string roleName)
+    {
+        var confirm = await DialogService.ShowMessageBox("Delete Role", "Are you sure you want to delete this role?", yesText: "Yes", cancelText: "No");
+        if (confirm == true)
+        {
+            try
+            {
+                var response = await HttpClient.DeleteAsync($"api/useradmin/{roleName}");
+                response.EnsureSuccessStatusCode();
+                await GetRoles();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+        }
+    }
+}

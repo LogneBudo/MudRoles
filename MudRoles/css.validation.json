@@ -1,0 +1,10 @@
+{
+  "css.lint.validProperties": [
+    "background",
+    "background-size"
+  ],
+  "css.lint.validValues": {
+    "background-size": [ "cover" ]
+  }
+}
+

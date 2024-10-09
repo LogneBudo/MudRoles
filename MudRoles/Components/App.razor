@@ -1,19 +1,17 @@
-﻿<!DOCTYPE html>
+﻿@using MudRoles.Components.Account.Shared
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="css/Roboto.css" rel="stylesheet" />
     <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/atom-one-dark.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="css/Ubuntu.css" rel="stylesheet">
+    <link href="css/Montserrat.css" rel="stylesheet">
     <link href="_content/MudBlazor.ThemeManager/MudBlazorThemeManager.css" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="css/MudBlazor.min.css" rel="stylesheet" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
     <script type="importmap">
         {
@@ -34,29 +32,21 @@
 <body>
 
     <Routes @rendermode="RenderModeForPage" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/languages/csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/languages/css.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightBlock(el);
-                hljs.addPlugin(new CopyButtonPlugin());
-            });
-        });
-
-        window.highlightSnippet = function () {
-            document.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightBlock(el);
-                hljs.addPlugin(new CopyButtonPlugin());
-            });
-        }
-    </script>
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
-
+    <script>
+        window.CookieFunction = {
+            acceptMessage: function (cookieString) {
+                document.cookie = cookieString;
+            }
+        };
+    </script>
+    <script>
+        window.getAntiForgeryToken = function () {
+            return document.getElementById('__RequestVerificationToken').value;
+        };
+    </script>
 </body>
 
 </html>
@@ -68,5 +58,5 @@
 
     private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
         ? null
-        : InteractiveAuto;
+        : InteractiveWebAssembly;
 }

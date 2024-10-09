@@ -42,7 +42,7 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         // Add the role claims
         foreach (var role in userInfo.Roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
         }
         authenticationStateTask = Task.FromResult(
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims,

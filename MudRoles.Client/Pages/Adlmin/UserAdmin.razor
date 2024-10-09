@@ -1,0 +1,132 @@
+﻿@page "/admin/useradmin"
+@inject HttpClient HttpClient
+@inject IDialogService DialogService
+
+@attribute [Authorize(Roles ="Admin")]
+
+<PageTitle>User Management</PageTitle>
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h3" GutterBottom="true">Users Management</MudText>
+        <MudText Typo="Typo.body1" GutterBottom="true">Admin section</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<br />
+<MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
+<MudDataGrid T="UserInfo" Hover="true" Items="@users">
+    <Columns>
+        <PropertyColumn HeaderClass="font-bold" Property="x => x.Email" />
+        <PropertyColumn HeaderClass="font-bold" Property="x => x.UserId" />
+        <TemplateColumn Title="Roles">
+            <CellTemplate Context="cellContext">
+                <ul>
+                @foreach (var role in cellContext.Item.Roles)
+                {
+                    <li>@role.RoleName</li>
+                }
+                </ul>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Roles">
+            <CellTemplate Context="cellContext">
+                <MudStack Row>
+                    <MudButton Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(()=> ManageRoles(cellContext.Item.UserId, cellContext.Item.Roles))">Manage Roles</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <NoRecordsContent>
+        <MudText>No keys available</MudText>
+    </NoRecordsContent>
+</MudDataGrid>
+@code {
+
+    private List<UserInfo> users = new();
+    private string apiKey = "";
+    private string errorMessage = string.Empty;
+    private List<RoleItem> allroles = new();
+    private UserInfo selectedUser = new UserInfo();
+    protected override async Task OnInitializedAsync()
+    {
+        // try
+        // {
+        //     var response = await HttpClient.GetAsync("api/configuration/apikey");
+        //     response.EnsureSuccessStatusCode();
+        //     apiKey = await response.Content.ReadAsStringAsync();   
+        //     await GetUsers();
+        // }
+        // catch (Exception ex)
+        // {
+        //     errorMessage = $"Error loading API keys: {ex.Message}";
+        // }
+        await GetAllRoles();
+        await GetUsers();
+    }
+    private async Task GetAllRoles()
+    {
+        try
+        {
+            // HttpClient.DefaultRequestHeaders.Clear();
+            // HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
+            allroles = await HttpClient.GetFromJsonAsync<List<RoleItem>>("api/useradmin/roles") ?? new();
+
+            errorMessage = string.Empty; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading API keys: {ex.Message}";
+        }
+    }
+    private async Task ManageRoles(string userId, List<RoleItem> roles)
+    {        
+        selectedUser = users.FirstOrDefault(x => x.UserId == userId) ?? new UserInfo();
+        try
+        {
+            var parameters = new DialogParameters<RolesDialog> { { x => x.Roles, allroles }, { x => x.User, selectedUser } };
+            var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+            var dialog = await DialogService.ShowAsync<RolesDialog>("Manage roles", parameters, options);
+            var result = await dialog.Result;
+            UserInfo userRolesResult = new();
+            if (result != null && !result.Canceled)
+            {
+                userRolesResult = result.Data as UserInfo ?? new();
+                
+                // Call the endpoint to update user roles
+                var response = await HttpClient.PostAsJsonAsync("api/useradmin/updateuserroles", userRolesResult);
+                if (response.IsSuccessStatusCode)
+                {
+                    // Handle success (e.g., show a success message, refresh data)
+                    await GetUsers(); // Refresh the datagrid
+                }
+                else
+                {
+                    // Handle error (e.g., show an error message)
+                    errorMessage = "Failed to update user roles.";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            
+            errorMessage = "Failed generic error! : " + ex.Message;
+        }
+    }
+    private async Task GetUsers()
+    {
+        try
+        {
+            HttpClient.DefaultRequestHeaders.Clear();
+            HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
+            var response = await HttpClient.GetFromJsonAsync<List<UserInfo>>("api/useradmin") ?? new();
+            users = response ?? new List<UserInfo>(); // Handle null response
+            errorMessage = string.Empty; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading API keys: {ex.Message}";
+        }
+       
+    }
+}

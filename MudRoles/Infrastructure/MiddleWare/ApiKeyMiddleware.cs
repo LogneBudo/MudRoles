@@ -1,5 +1,7 @@
-﻿using MudRoles.Controllers;
+﻿using Microsoft.Extensions.Primitives;
+using MudRoles.Controllers;
 using MudRoles.Infrastructure.Services;
+using Nextended.Core.Extensions;
 
 namespace MudRoles.Infrastructure.MiddleWare
 {
@@ -36,19 +38,20 @@ namespace MudRoles.Infrastructure.MiddleWare
                 {
                     var apiKeyService = scope.ServiceProvider.GetRequiredService<IApiKeyService>();
 
-                    if (!context.Request.Headers.TryGetValue("ApiKey", out var extractedApiKey))
+                    if (!context.Request.Headers.TryGetValue("ApiKey", out var extractedApiKey) || StringValues.IsNullOrEmpty(extractedApiKey))
                     {
                         context.Response.StatusCode = 401;
                         await context.Response.WriteAsync("API Key was not provided.");
                         return;
                     }
 
-                    if (string.IsNullOrEmpty(extractedApiKey) || !await apiKeyService.ValidateApiKeyAsync(extractedApiKey))
+                    if (!await apiKeyService.ValidateApiKeyAsync(extractedApiKey.ToString()))
                     {
                         context.Response.StatusCode = 401;
                         await context.Response.WriteAsync("Unauthorized client.");
                         return;
                     }
+
                 }
             }
 

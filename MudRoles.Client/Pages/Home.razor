@@ -1,13 +1,17 @@
 ﻿@page "/"
 @using MudBlazor.Extensions.Components.ObjectEdit.Options
+@using System.Text.Encodings.Web
+
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender:false))
+
 <PageTitle>Home</PageTitle>
 
 <MudPage Row="3" FullScreen="FullScreen.FullWithoutAppbar">
     <MudSection Column="1" Class="pb-6" ColSpan="6" Row="1" RowSpan="1">
         <MudPaper Elevation="0" Class="d-flex align-center justify-center">
-         &nbsp;   <MudText Typo="Typo.h1">Blazor Identity with Roles</MudText>
+            <MudText Typo="Typo.h1">Blazor Identity with Roles</MudText>
         </MudPaper>
     </MudSection>
     <MudSection Class="pb-6" Column="1" ColSpan="6" Row="2" RowSpan="2">
@@ -38,38 +42,52 @@
 </MudPage>
 <br />
 <br />
-    <CodeBlock>
-public class PersonModel
-{
-    public int Id { get; set; }
-    [Display(Name="First Name")]
-    public string Name { get; set; }
-    public string City { get; set; }
-    public string State { get; set; }
-    [BlazinHeaderFormat("{0:C}")]
-    public int Salary { get; set; }
-    [BlazinHeaderIgnore]
-    public string ThisColumnWontEvenShowUp { get; set; }
-}
-</CodeBlock>
+<MudText Typo="Typo.body1"></MudText>
 <br />
-<CodeBlock Language="csharp">
-public class HelloWorld
-{
-    public static void Main()
-    {
-        Console.WriteLine(&quot;Hello, World!&quot;);
+<MudText Typo="Typo.body1"></MudText>
+<br />
+<MudText Typo="Typo.body1"></MudText>
+<br />
+
+
+<style>
+    /* Remove focus outline and border for h1 elements */
+    h1:focus, h1:focus-visible {
+        outline: none;
+        border: none;
     }
-}
-</CodeBlock>
-    <br />
-<CodeBlock Language="javascript">
-function helloWorld() {
-    console.log('Hello, World!');
-}
-</CodeBlock>
+</style>
+
 @code {
 
+    private const string HelloWorld = @"
+    public class HelloWorld
+    {
+        public static void Main()
+        {
+            Console.WriteLine(""Hello, World!"");
+        } 
+    ";
+    private const string Declaration = @"
+    public class PersonModel
+    {
+        public int Id { get; set; }
+        [Display(Name=""First Name"")];
+        public string Name { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        [BlazinHeaderFormat(""{0:C}"")];
+        public int Salary { get; set; }
+        [BlazinHeaderIgnore]
+        public string ThisColumnWontEvenShowUp { get; set; }
+    }
+    ";
+    private const string Javascript = @"
+    function helloWorld() {
+        console.log('Hello, World!');
+    }
+    ";
+    
     private List<TopicModel> topics = new List<TopicModel>();
     MudBlazor.Extensions.Components.MudExCardList<object>? component;
     private readonly Dictionary<string, string> iconMappings = new()
@@ -83,12 +101,13 @@ function helloWorld() {
     {
         Navigation.NavigateTo(endpoint);
     }
+
     protected override Task OnInitializedAsync()
     {
         var jsonString = @"
         [
-            { ""Title"": ""Blazor Identity with Roles"", ""Text"": ""Implementing identity management with role-based access control in Blazor applications."", ""Subline"": ""Secure your Blazor apps with role-based identity management."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""/blazoridentity""  },
-            { ""Title"": ""MudBlazor"", ""Text"": ""Utilizing MudBlazor components to build modern and responsive web applications."", ""Subline"": ""Enhance your Blazor apps with MudBlazor's rich component library."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""/workingwithmudblazor"" },
+            { ""Title"": ""Blazor Identity with Roles"", ""Text"": ""Implementing identity management with role-based access control in Blazor applications."", ""Subline"": ""Secure your Blazor apps with role-based identity management."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""blazoridentity""  },
+            { ""Title"": ""MudBlazor"", ""Text"": ""Utilizing MudBlazor components to build modern and responsive web applications."", ""Subline"": ""Enhance your Blazor apps with MudBlazor's rich component library."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""workingwithmudblazor"" },
             { ""Title"": ""MudBlazor Static"", ""Text"": ""Creating static web pages using MudBlazor components for a seamless user experience."", ""Subline"": ""Build static web pages with MudBlazor's powerful components."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""mudblazor"" },
             { ""Title"": ""CodeBeam MudBlazor Extensions"", ""Text"": ""Extending MudBlazor with custom components and additional functionalities."", ""Subline"": ""Customize and extend MudBlazor to fit your specific needs."", ""Icon"": ""Icons.Custom.Brands.MudBlazor"", ""Link"": ""mudblazorstatic"" },
             { ""Title"": ""Highlight.js"", ""Text"": ""Integrating Highlight.js for syntax highlighting in your web applications."", ""Subline"": ""Add beautiful syntax highlighting to your code blocks with Highlight.js."", ""Icon"": ""Icons.Material.Filled.Security"", ""Link"": ""codebeam"" },

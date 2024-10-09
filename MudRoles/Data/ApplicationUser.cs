@@ -1,5 +1,6 @@
-
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using MudRoles.Client.Components;
 
 namespace MudRoles.Data;
 
@@ -32,4 +33,17 @@ public class ApplicationUser : IdentityUser
     /// Gets or sets the avatar ID of the user.  
     /// </summary>  
     public string? AvatarId { get; set; }
+
+    /// <summary>  
+    /// Gets or sets the avatar choice of the user.  
+    /// </summary>  
+    public string? AvatarChoice { get; set; }
+
+    /// <summary>  
+    /// Gets or sets the uploaded avatar image of the user.  
+    /// </summary>  
+    public byte[]? UploadedAvatar { get; set; }
+
+    [NotMapped]
+    public List<RoleItem> Roles { get; set; } = [];
 }

@@ -1,5 +1,13 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Http
+@using Newtonsoft.Json
+@inherits LayoutComponentBase
 @inject ThemeService ThemeService
+@inject ConsentService ConsentService
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender:false))
+
 <MudThemeProvider IsDarkMode="@IsDarkMode" Theme="@_currentTheme" />
 <MudAppBar Elevation="25">
     <MudIcon Icon="@CustomIcons.LogoWhite" Size="Size.Large" ViewBox="0 0 500 500" />
@@ -8,22 +16,51 @@
         <MudIconButton Icon="@(_drawerOpen ? Icons.Material.Filled.SwitchLeft : Icons.Material.Filled.SwitchRight)" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
     </MudToolBar>
     <MudSpacer />
+    <AuthorizeView>
+        <Authorized>
+            <MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                <ActivatorContent>
+                    <MudAvatar Size="Size.Small" Elevation="4" Color="Color.Secondary">
+                        <MudImage Src="plhdr.jpg" />
+                    </MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem><MudNavLink Href="Profile" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Manage Profile</MudNavLink></MudMenuItem>
+                    <MudMenuItem>
+                        <form class="mud-nav-item">
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                            <button type="button" class="mud-nav-link mud-ripple" @onclick="LogMeOut">
+                                <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Default" Class="mr-3"></MudIcon> Logout
+                            </button>
+                        </form>
+                    </MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+        </Authorized>
+        <NotAuthorized>
+            
+        </NotAuthorized>
+    </AuthorizeView>    
+    <MudIconButton Icon="@Icons.Material.Filled.Cookie" Color="Color.Inherit" OnClick="@((e) => cookieConsentRef?.ShowConsentBanner())" />
     <MudTooltip Text="Toggle Dark Mode">
         <MudIconButton Icon="@(IsDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Outlined.DarkMode)" Color="Color.Inherit" OnClick="@ToggleDarkMode" />
     </MudTooltip>
 </MudAppBar>
-<MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Always">
+<MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Docked">
     <NavMenu />
 </MudDrawer>
 <MudMainContent Class="mt-20 pa-2">
     <MudContainer MaxWidth="MaxWidth.False">
         <CascadingValue Value="@IsDarkMode">
+            <CookieConsent @ref="cookieConsentRef" />
             @ChildContent
         </CascadingValue>
     </MudContainer>
 </MudMainContent>
 
 @code {
+    private string? currentUrl;
+    private CookieConsent? cookieConsentRef;
     private MudTheme _currentTheme = MudRolesTheme.DefaultTheme;
     [Parameter]
     public EventCallback OnDarkModeToggle { get; set; }
@@ -31,6 +68,59 @@
     public RenderFragment? ChildContent { get; set; }
     public bool IsDarkMode { get; set; }
     private bool _drawerOpen = true;
+    override protected void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+        ConsentService.OnCookieShown += HandleCookieShown;
+    }
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+    private async Task LogMeOut()
+    {
+        // Call the server endpoint to get the anti-forgery token
+        var response = await HttpClient.GetAsync("api/auth/GetToken");
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var token = JsonConvert.DeserializeObject<TokenResponse>(responseBody)?.Token;
+        var values = new Dictionary<string, string>
+            {
+                { "ReturnUrl", currentUrl! },
+                { "__RequestVerificationToken", token! }
+            };
+
+        var content = new FormUrlEncodedContent(values);
+
+        var logoutResponse = await HttpClient.PostAsync("Account/Logout", content);
+
+        if (logoutResponse.IsSuccessStatusCode)
+        {
+            var logoutResponseBody = await logoutResponse.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<LogoutResponse>(logoutResponseBody);
+
+            if (result != null && result.success)
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                Console.WriteLine("Logout failed.");
+            }
+        }
+        else
+        {
+            var errorMessage = await logoutResponse.Content.ReadAsStringAsync();
+            Console.WriteLine($"Logout failed: {errorMessage}");
+        }
+    }
+
+    private async Task HandleCookieShown()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
     private void ToggleDarkMode()
     {
         IsDarkMode = !IsDarkMode;
@@ -39,5 +129,18 @@
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+    public class LogoutResponse
+    {
+        public bool success { get; set; }
+        public string redirectUrl { get; set; } = "/";
+    }
+    public class TokenResponse
+    {
+        public string Token { get; set; } = string.Empty;
     }
 }

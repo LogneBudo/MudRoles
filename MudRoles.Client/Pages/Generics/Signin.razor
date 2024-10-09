@@ -1,0 +1,249 @@
+﻿@page "/signin"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
+@inject ISnackbar Snackbar
+
+<PageTitle>Login to CodeMoa</PageTitle>
+<MudThemeProvider IsDarkMode="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme)" Theme="@ThemeService.CurrentTheme" />
+<MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
+    <MudGrid Spacing="0">
+        <MudItem Class="@GetBackgroundClass()" lg="6" md="6">
+            <MudText Color="Color.Primary" Typo="Typo.h3">CodeMoa</MudText>
+            <MudText Color="Color.Secondary" Typo="Typo.h3">Infrastructure</MudText>
+        </MudItem>
+        <MudItem lg="6" md="6">
+            <MudPaper Elevation="3" Class="pa-8 rounded-r-xl">
+                <EditForm EditContext="editContext" method="post" OnValidSubmit="LoginUser" OnInvalidSubmit="HandleInvalidSubmit" FormName="login">
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudIcon Icon="@CustomIcons.LogoDark" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500" Style="width: 100px; height: 100px;" />
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText Typo="Typo.h4">Sign-in</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText>
+                                    Login with your Credentials.
+                                </MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex justify-center">
+                                <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12">
+                           <div class="error" >
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                           </div>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.Email)" @bind-Value="Input.Email"
+                                          Label="Email" Placeholder="name@example.com" OnBlur="ClearErrorMessage" OnKeyDown="ClearErrorMessage" Immediate="true"
+                                          UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" }, { "aria-label", "Email" } } )" />
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.Password)" @bind-Value="Input.Password"
+                                          Label="Password" InputType="InputType.Password" Placeholder="password" OnKeyDown="ClearErrorMessage" OnBlur="ClearErrorMessage" Immediate="true"
+                                          UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" },  { "aria-label", "Password" } } )" />
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudCheckBox Color="Color.Primary" For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudCheckBox>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth="false" Disabled="@isButtonDisabled">
+                                @if (isLoading)
+                                {
+                                    Console.WriteLine("Loading indicator is visible");
+                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                }
+                                else
+                                {
+                                    <span>Log in</span>
+                                }
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+                <MudGrid Class="mt-4">
+                    <MudItem xs="12">
+                        <MudLink Href="Account/ForgotPassword">Forgot your password?</MudLink><br />
+                        <MudLink Href="@(NavigationManager.GetUriWithQueryParameters("/signup", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</MudLink><br />
+                        <MudLink Href="Account/ResendEmailConfirmation">Resend email confirmation</MudLink>
+                    </MudItem>
+                </MudGrid>
+                <MudItem xs="12">
+                    &nbsp;
+                </MudItem>
+                <MudItem xs="12">
+                    &nbsp;
+                </MudItem>
+                <MudItem xs="12">
+                    <MudAlert Class="d-flex justify-flex-end" Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Right">
+                        Use another service to log in.
+                        
+                    </MudAlert>
+                </MudItem>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+<style>
+    .loginbg {
+        background: url("day2.jpg") no-repeat center center / cover;
+        box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);
+    }
+    .error {
+        color: red;
+    }
+    .loginbg-night {
+        background: url("night.jpg") no-repeat center center / cover;
+        box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);
+    }
+</style>
+
+@code {
+    private string? errorMessage;
+    private bool isLoading = false;
+    private EditContext? editContext;
+    private bool isButtonDisabled
+    {
+        get
+        {
+            var disabled = isLoading || !(editContext?.Validate() ?? true);
+            Console.WriteLine($"isButtonDisabled: {disabled}, isLoading: {isLoading}, editContext.Validate(): {editContext?.Validate()}");
+            return disabled;
+        }
+    }
+    [SupplyParameterFromForm]
+    private SignInModel Input { get; set; } = new()
+    {
+        Email = "istankovic@hotmail.com",
+        Password = "Zorro@777",
+        RememberMe = false
+    };
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+    private void LogValidationState()
+{
+    Console.WriteLine($"isButtonDisabled: {isButtonDisabled}");
+    Console.WriteLine($"isLoading: {isLoading}");
+    Console.WriteLine($"editContext.Validate(): {editContext?.Validate()}");
+}
+    protected async override Task OnInitializedAsync()
+    {
+        editContext = new EditContext(Input);
+        editContext.OnFieldChanged += (sender, args) =>
+         {
+             LogValidationState();
+             StateHasChanged();
+         };
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+        await base.OnInitializedAsync();
+    }
+    private async Task HandleThemeChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    private string GetBackgroundClass()
+    {   string newClass = "";
+        newClass = ThemeService.CurrentTheme == MudRolesTheme.DarkTheme ? "loginbg-night rounded-l-xl d-flex flex-column object-contain align-center justify-center" : "loginbg rounded-l-xl d-flex flex-column object-contain align-center justify-center";
+        return newClass;
+    }
+    public async Task LoginUser()
+    {
+        isLoading = true;
+        errorMessage = null; // Clear error message before login attempt
+        StateHasChanged(); // Ensure the UI updates before the login attempt
+        try
+        {
+            var loginData = new SignInModel
+                {
+                    Email = Input.Email,
+                    Password = Input.Password,
+                    RememberMe = Input.RememberMe
+                };
+
+            var response = await HttpClient.PostAsJsonAsync<SignInModel>("api/auth/signin", loginData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var redirectUrl = ReturnUrl ?? "/";
+                NavigationManager.NavigateTo(redirectUrl, true);
+            }
+            else
+            {
+                await HandleResponse(response);
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+            Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+            Console.WriteLine($"HttpRequestException: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Unexpected error: {ex.Message}";
+            Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+            Console.WriteLine($"Exception: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // Ensure the UI updates after loading
+        }
+    }
+    public class SignInModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Password is required.")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; }
+    }
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("HandleInvalidSubmit called");
+        errorMessage = "Error: Please fill in all required fields.";
+        StateHasChanged();
+    }
+    private async Task HandleResponse(HttpResponseMessage response)
+    {
+        var responseContent = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            errorMessage = "Error: Invalid login attempt.";
+            Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Locked)
+        {
+            NavigationManager.NavigateTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = $"Error: An unexpected error occurred. Response: {responseContent}";
+            Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+        }
+    }
+    private void ClearErrorMessage()
+    {
+        errorMessage = null;
+        StateHasChanged();
+    }
+}

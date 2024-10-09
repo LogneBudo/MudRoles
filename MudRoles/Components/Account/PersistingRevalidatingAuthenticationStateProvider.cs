@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MudRoles.Client;
 using MudRoles.Data;
+using MudRoles.Infrastructure.Converter;
 
 namespace MudRoles.Components.Account;
 
@@ -100,7 +101,7 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
             var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
             // Retrieve all roles from the claims
             var roles = principal.FindAll(options.ClaimsIdentity.RoleClaimType).Select(claim => claim.Value).ToList();
-
+            
             // Ensure userId and email are not null before persisting the state
             if (userId != null && email != null)
             {
@@ -109,7 +110,7 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
                 {
                     UserId = userId,
                     Email = email,
-                    Roles = roles
+                    Roles = RoleConverter.ConvertToRoleItems(roles)
                 });
             }
         }

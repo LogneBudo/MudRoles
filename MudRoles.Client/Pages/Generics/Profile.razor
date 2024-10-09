@@ -1,0 +1,116 @@
+﻿@page "/profile"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Your Profile</PageTitle>
+<MudText Typo="Typo.h3" GutterBottom="true">Profile Section</MudText>
+<br />
+<MudTabs Outlined="true" Position="MudBlazor.Position.Left" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="flex-column pa-6">
+    <MudTabPanel Text="Profile management">
+        <ProfileManagement />
+    </MudTabPanel>
+    <MudTabPanel Text="Email Management">
+        <EmailManagement  />
+    </MudTabPanel>
+    <MudTabPanel Text="Change password">
+        <PasswordUpdater />
+    </MudTabPanel>
+    <MudTabPanel Text="Two Factor Authentication">
+        <TwoFAuth />
+    </MudTabPanel>
+    <MudTabPanel Text="Personal Data">
+        <MudText Typo="Typo.h6" GutterBottom="true">GDPR Personal Data Management</MudText>
+        <br />
+        <br />
+        <MudGrid>
+            <MudItem xs="6">
+                <MudCard Elevation="3">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">The Story Book</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>This day everything happened.</MudText>
+                        <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="6">
+                <MudGrid>
+                    <MudItem md="12">
+                        <MudText Typo="Typo.body1">
+                            Your account contains personal data that you have given us. This page allows you to download or delete that data.
+                        </MudText>
+                    </MudItem>
+                    <MudItem md="12">
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Text">
+                            Deleting this data will permanently remove your account, and this cannot be recovered.
+                        </MudAlert>
+                    </MudItem>
+                    <MudItem md="12">
+                        <form action="Account/Manage/DownloadPersonalData" method="post">
+                            <AntiforgeryToken />
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Download</MudButton>
+                        </form>
+                    </MudItem>
+                    <MudItem md="12">
+                        <MudLink Href="Account/Manage/DeletePersonalData" Color="Color.Error">Delete</MudLink>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+
+    [SupplyParameterFromForm]
+    private ProfileModel Input { get; set; } = new();
+
+
+    private async Task OnSubmitForgetBrowserAsync()
+    {
+        // await SignInManager.ForgetTwoFactorClientAsync();
+
+        // RedirectManager.RedirectToCurrentPageWithStatus(
+        //     "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.",
+        //     HttpContext);
+        await Task.CompletedTask;
+    }
+    public class ProfileModel
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Current password")]
+        public string OldPassword { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "New password")]
+        public string NewPassword { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm new password")]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "New email")]
+        public string? NewEmail { get; set; }
+
+        [Phone]
+        [Display(Name = "Phone number")]
+        public string? PhoneNumber { get; set; }
+
+        [Display(Name = "Dark Theme Preference")]
+        public bool IsDarkTheme { get; set; }
+
+    }
+}

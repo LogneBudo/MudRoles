@@ -19,7 +19,11 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink Href="apikeys" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Api">Api keys</MudNavLink>
     <MudNavLink Href="swagger/index.html" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.Uncategorized.BioHazard">Swagger</MudNavLink>
-    <MudNavGroup Title="How to" Icon="@Icons.Material.Filled.HowToReg" Expanded="true">
+    <MudNavGroup Title="Admin Section" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="false">
+        <MudNavLink Href="admin/useradmin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.VerifiedUser">User Management</MudNavLink>
+        <MudNavLink Href="admin/roleadmin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">Roles Management</MudNavLink>
+    </MudNavGroup>
+    <MudNavGroup Title="How to" Icon="@Icons.Material.Filled.HowToReg" Expanded="false">
         <MudNavLink Href="blazoridentity" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">Identity + Roles</MudNavLink>
         <MudNavLink Href="apikeysforendpoints" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Api">API Keys for endpoints</MudNavLink>
         <MudNavLink Href="roleapi" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Api">Role based APIs</MudNavLink>
@@ -32,10 +36,11 @@
         <MudNavLink Href="dependency" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Mediation">Dependency Injection</MudNavLink>
         <MudNavLink Href="highlight" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Code">Code Highlighting</MudNavLink>
     </MudNavGroup>
-    <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Manage Profile</MudNavLink>
-    <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">Settings</MudNavLink>
+    @* <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Manage Profile</MudNavLink> *@
     <AuthorizeView>
         <Authorized>
+            <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">Settings</MudNavLink>
+            <MudNavLink Href="profile" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SelfImprovement">Profile</MudNavLink>
             <form action="Account/Logout" method="post" class="mud-nav-item">
                 <AntiforgeryToken />
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />
@@ -45,8 +50,8 @@
             </form>
         </Authorized>
         <NotAuthorized>
-            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Register</MudNavLink>
-            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password">Login</MudNavLink>
+            <MudNavLink Href="signup" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Register</MudNavLink>
+            <MudNavLink Href="signin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password">Login</MudNavLink>
         </NotAuthorized>
     </AuthorizeView>
 </MudNavMenu>

@@ -1,0 +1,103 @@
+﻿@using MudBlazor
+@using FluentValidation
+@using MudRoles.Client.Pages
+@using static MudRoles.Client.Pages.ApiMgt
+
+<EditForm Model="@User" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+    <MudDialog Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface py-10" ActionsClass="dialog-background-surface">
+        <DialogContent>
+            <DataAnnotationsValidator />
+            @if (ShowMudPaper)
+            {
+                <MudPaper Class="px-8 py-4" Elevation="3">
+                    <MudText Color="Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                </MudPaper>
+            }
+            <MudText><b>User:</b>&nbsp;&nbsp;@User?.Email</MudText>
+            <br />
+            <MudText>Roles: </MudText>
+            <br/>
+            @foreach (var roleItem in Roles)
+            {
+                <MudSwitch @bind-Value="roleItem.IsAssigned" Disabled="@(roleItem.RoleName == "User")" ThumbIcon="@(roleItem.IsAssigned == true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(roleItem.IsAssigned == true ? Color.Success : Color.Error)">@roleItem.RoleName</MudSwitch>
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Assigning</MudText>
+                }
+                else
+                {
+                    <MudText>Assign</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+<style>
+    ul.validation-errors {
+        list-style-type: square !important;
+    }
+
+    .blur {
+        backdrop-filter: blur(10px);
+    }
+
+    .dialog-background {
+        background-color: transparent;
+    }
+
+    .dialog-background-title {
+        background: rgb(from var(--mud-palette-primary) r g b / 50%);
+        color: var(--mud-palette-white);
+    }
+
+    .dialog-background-surface {
+        background: rgb(from var(--mud-palette-surface) r g b / 75%);
+    }
+</style>
+@code {
+    private bool _processing = false;
+    private string errorMessage = string.Empty;
+    bool ShowMudPaper = false;
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+    [Parameter]
+    public UserInfo? User { get; set; }
+    [Parameter]
+    public List<RoleItem> Roles { get; set; } = new();
+    protected override void OnInitialized()
+    {
+        if (User != null)
+        {
+            // Initialize Roles to reflect the user's current roles
+            foreach (var roleItem in Roles)
+            {
+                roleItem.IsAssigned = User.Roles.Any(r => r.RoleName == roleItem.RoleName);
+            }
+        }
+    }
+    private void HandleInvalidSubmit()
+    {
+        ShowMudPaper = true;
+        StateHasChanged();
+    }
+    private async void OnValidSubmit(EditContext context)
+    {
+        if (User != null)
+        {
+            _processing = true;
+            await Task.Delay(2000);
+            User.Roles = Roles;
+            _processing = false;
+            MudDialog?.Close(DialogResult.Ok(User));
+        }
+    }
+    private void Cancel() => MudDialog?.Cancel();
+}

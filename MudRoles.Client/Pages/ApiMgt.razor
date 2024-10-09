@@ -6,6 +6,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject IConfiguration Configuration
+
 @attribute [Authorize]
 <PageTitle>Api Management</PageTitle>
 
@@ -19,13 +20,7 @@
     </MudItem>
 </MudGrid>
 
-@{
-    // TODO this works (C# comment)
-    /* TODO this works 
-     * Voila this is working
-     * (C# multi-line comment) */
-}
-<MudTabs Elevation="2" Outlined="true" Position="Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+<MudTabs Elevation="2" Outlined="true" Position="MudBlazor.Position.Top" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
     <MudTabPanel Text="Vault">
         <MudText Typo="Typo.h5" GutterBottom="true">Active</MudText>
         <MudDataGrid T="ApiKey" Hover="true" Items="@userApiKeys.Where(x=>x.ExpirationDate > DateTime.UtcNow).ToList()">
@@ -35,7 +30,8 @@
                     <CellTemplate Context="cellContext">
                         @if (cellContext.Item.Key != null)
                         {
-                            <MudButton Variant="Variant.Filled" OnClick="@(cellContext.Item != null ? (() => HandleKeyButtonClick(cellContext.Item)) : null)" EndIcon="@(cellContext.Item.IsKeyVisible ? Icons.Material.Filled.ContentCopy : Icons.Material.Filled.VisibilityOff)">@GetMaskedKey(cellContext.Item)</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="true" ButtonType="ButtonType.Submit" @onclick="GenerateApiKeys">Generate API Keys</MudButton>
+
                         }
                     </CellTemplate>
                 </TemplateColumn>
@@ -184,6 +180,17 @@
             errorMessage = $"Error fetching API key: {ex.Message}";
         }
     }
+    private async Task GenerateApiKeys()
+    {
+        if (scopes == null)
+        {
+            errorMessage = "Scopes cannot be null.";
+            return;
+        }
+
+        await PostGenerateAsync(scopes);
+    }
+
     private string GetMaskedKey(ApiKey apiKey)
     {
         if (apiKey.IsKeyVisible)
@@ -221,8 +228,8 @@
     private async Task PostGenerateAsync(List<Scope> scopes)
     {
         // Add the API key to the request headers
-        HttpClient.DefaultRequestHeaders.Clear();
-        HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
+        // HttpClient.DefaultRequestHeaders.Clear();
+        // HttpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
 
         var parameters = new DialogParameters<ApiKeyDialog> { { x => x.Scopes, scopes } };
         var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
@@ -254,6 +261,7 @@
         public string? Endpoint { get; set; }
         public bool IsChecked { get; set; }
     }
+
     private async Task DeleteKey(int apiKeyId)
     {
         var parameters = new DialogParameters
@@ -266,7 +274,7 @@
         var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirm Delete", parameters, options);
         var result = await dialog.Result;
 
-        if (result.Canceled)
+        if (result == null || result.Canceled)
         {
             return; // User canceled the delete action
         }
@@ -327,47 +335,52 @@
     {
         return verb.ToUpperInvariant() switch
         {
-            "POST" => "font-weight:bold;width:150px;background-color:" + VerbColors.POST + ";",
-            "GET" => "font-weight:bold;width:150px;background-color:" + VerbColors.GET + ";",
-            "DELETE" => "font-weight:bold;width:150px;background-color:" + VerbColors.DELETE + ";",
-            "HEAD" => "font-weight:bold;width:150px;background-color:" + VerbColors.HEAD + ";",
-            "OPTIONS" => "font-weight:bold;width:150px;background-color:" + VerbColors.OPTIONS + ";",
-            "PATCH" => "font-weight:bold;width:150px;background-color:" + VerbColors.PATCH + ";",
-            "PUT" => "font-weight:bold;width:150px;background-color:" + VerbColors.PUT + ";",
-            _ => "#000000" // Default color if verb is not recognized
+            "POST" => "background-color:" + VerbColors.POST + ";",
+            "GET" => "background-color:" + VerbColors.GET + ";",
+            "DELETE" => "background-color:" + VerbColors.DELETE + ";",
+            "HEAD" => "background-color:" + VerbColors.HEAD + ";",
+            "OPTIONS" => "background-color:" + VerbColors.OPTIONS + ";",
+            "PATCH" => "background-color:" + VerbColors.PATCH + ";",
+            "PUT" => "background-color:" + VerbColors.PUT + ";",
+            _ => "background-color:#000000;" // Default color if verb is not recognized
         };
     }
+
     private async Task HandleKeyButtonClick(ApiKey apiKey)
     {
-        if (apiKey.IsKeyVisible)
+        if (apiKey != null)
         {
-            // If the key is already visible, copy it to the clipboard
-            await CopyToClipboard(apiKey.Key);
-            // Cancel any existing timer
-            _cancellationTokenSource?.Cancel();
-            // Revert the key visibility immediately
-            ToggleKeyVisibility(apiKey);
-        }
-        else
-        {
-            // If the key is not visible, toggle its visibility
-            ToggleKeyVisibility(apiKey);
-            // Start a timer to revert the visibility after 15 seconds
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
-            try
+            if (apiKey.IsKeyVisible)
             {
-                await Task.Delay(8000, token);
-                if (!token.IsCancellationRequested)
+                // If the key is already visible, copy it to the clipboard
+                await CopyToClipboard(apiKey.Key ?? "");
+                // Cancel any existing timer
+                _cancellationTokenSource?.Cancel();
+                // Revert the key visibility immediately
+                ToggleKeyVisibility(apiKey);
+            }
+            else
+            {
+                // If the key is not visible, toggle its visibility
+                ToggleKeyVisibility(apiKey);
+                // Start a timer to revert the visibility after 15 seconds
+                _cancellationTokenSource = new CancellationTokenSource();
+                var token = _cancellationTokenSource.Token;
+                try
                 {
-                    ToggleKeyVisibility(apiKey);
+                    await Task.Delay(8000, token);
+                    if (!token.IsCancellationRequested)
+                    {
+                        ToggleKeyVisibility(apiKey);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    // Task was canceled, do nothing
                 }
             }
-            catch (TaskCanceledException)
-            {
-                // Task was canceled, do nothing
-            }
         }
+       
     }
 
     public class VerbColors
@@ -387,12 +400,11 @@
         public string? Name { get; set; }
 
         public string? KeyPrefix { get; set; }
-        public string? Key { get; set; }
+        public string? Key { get; set; } = string.Empty;
         public DateTime CreationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string? UserId { get; set; }
         public List<Scope> Scopes { get; set; } = new();
         public bool IsKeyVisible { get; set; } = false; // New property to track visibility
     }
-}
 }

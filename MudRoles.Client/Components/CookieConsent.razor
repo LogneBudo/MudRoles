@@ -1,0 +1,114 @@
+﻿@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@if (showConsentBanner)
+{
+    <div class="cookie-consent-banner">
+        <p>We use cookies to ensure you get the best experience on our website. <a href="/privacy">Learn more</a></p>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AcceptCookies">Accept</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="DeclineCookies">Decline</MudButton>
+    </div>
+}
+
+<style>
+    .cookie-consent-banner {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1em;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public bool showConsentBanner { get; set; } = true;
+
+    private bool isUserAuthenticated = false;
+    private List<Func<Task>> actionsToRunAfterRender = new List<Func<Task>>();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // run all the actions (.NET code) **once** after rendering
+        foreach (var actionToRun in actionsToRunAfterRender)
+        {
+            actionToRun();
+        }
+        // clear the actions to make sure the actions only run **once**
+        actionsToRunAfterRender.Clear();
+        return base.OnAfterRenderAsync(firstRender);
+    }
+    public void ShowConsentBanner()
+    {
+        showConsentBanner = true;
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isUserAuthenticated = authState.User?.Identity?.IsAuthenticated ?? false;
+
+        if (isUserAuthenticated)
+        {
+            actionsToRunAfterRender.Add(() => CheckCookieConsent());
+        }
+        else
+        {
+            actionsToRunAfterRender.Add(() => CheckCookieConsent());
+            showConsentBanner = false;
+        }
+
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        var authState = await task;
+        if (authState.User?.Identity?.IsAuthenticated == true && !isUserAuthenticated)
+        {
+            isUserAuthenticated = true;
+            await CheckCookieConsent();
+        }
+        else if (authState.User?.Identity?.IsAuthenticated == false)
+        {
+            isUserAuthenticated = false;
+            showConsentBanner = false;
+            StateHasChanged();
+        }
+    }
+
+    public async Task CheckCookieConsent()
+    {
+        var response = await HttpClient.GetAsync("/api/cookieconsent");
+        if (response.IsSuccessStatusCode)
+        {
+            var consent = await response.Content.ReadAsStringAsync();
+            showConsentBanner = consent != "true";
+        }
+        else
+        {
+            await Task.CompletedTask;
+            showConsentBanner = true;
+        }
+    }
+
+    private async Task AcceptCookies()
+    {
+        await SetCookieConsent(true);
+        showConsentBanner = false;
+        StateHasChanged();
+    }
+
+    private async Task DeclineCookies()
+    {
+        await SetCookieConsent(false);
+        showConsentBanner = false;
+        StateHasChanged();
+    }
+
+    private async Task SetCookieConsent(bool consent)
+    {
+        await HttpClient.PostAsJsonAsync("/api/cookieconsent", new { consent });
+    }
+
+}

@@ -1,0 +1,62 @@
+﻿@typeparam TItem
+
+<MudGrid Class="mx-0">
+    <MudItem xs="12">
+        <MudText Class="mud-typography mud-typography-body1 mud-input-label pt-3 --mud-palette-text-secondary">@Label</MudText>
+    </MudItem>
+    <MudRadioGroup T="TItem" @bind-Value="SelectedItem">
+        <div class="d-flex align-items-baseline">
+            @foreach (var item in Items)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudButton Class="avatar-container d-flex ml-5" Variant="Variant.Filled" @onclick="() => OnSelectedItemChanged(item.Value)" >
+                        <MudImage Src="@item.ImageUrl" Alt="Avatar" Class="avatar-image" />
+                        <MudRadio T="TItem" Value="@item.Value" Class="avatar-radio" />
+                    </MudButton>
+                </MudItem>
+            }
+        </div>
+    </MudRadioGroup>
+</MudGrid>
+<style>
+    .avatar-container {
+        position: relative;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 90px;
+        width: 90px;
+        margin: 8px;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .avatar-radio {
+        position: absolute;
+        top: -11px;
+        right: -12px;
+    }
+</style>
+@code {
+    [Parameter]
+    public List<AvatarItem<TItem>> Items { get; set; } = new();
+
+    [Parameter]
+    public TItem? SelectedItem { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> SelectedItemChanged { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "Select an Avatar";
+
+    private async Task OnSelectedItemChanged(TItem selectedItem)
+    {
+        SelectedItem = selectedItem;
+        await SelectedItemChanged.InvokeAsync(selectedItem);
+    }
+}

@@ -1,0 +1,173 @@
+﻿@page "/two-factor-auth"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<MudText Typo="Typo.h6" GutterBottom="true">Two-factor authentication (2FA)</MudText>
+<br />
+<br />
+<MudGrid>
+    <MudItem xs="6">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">The Story Book</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>This day everything happened.</MudText>
+                <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="6">
+        @if (canTrack)
+        {
+            if (is2faEnabled)
+            {
+                if (recoveryCodesLeft == 0)
+                {
+                    <MudAlert Variant="Variant.Text" Severity="Severity.Error">You have no recovery codes left.</MudAlert>
+
+                    <MudText Typo="Typo.body1" Class="pt-4">
+                        You must <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>
+                        before you can log in with a recovery code.
+                    </MudText>
+                }
+                else if (recoveryCodesLeft == 1)
+                {
+                    <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have 1 recovery code left.</MudAlert>
+
+                    <MudText Typo="Typo.body1" Class="pt-4">
+                        You can <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
+                    </MudText>
+                }
+                else if (recoveryCodesLeft <= 3)
+                {
+                    <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have @recoveryCodesLeft recovery codes left.</MudAlert>
+
+                    <MudText Typo="Typo.body1" Class="pt-4">
+                        You should <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
+                    </MudText>
+                }
+
+                if (isMachineRemembered)
+                {
+                    <form style="display: inline-block" @formname="forget-browser" @onsubmit="OnSubmitForgetBrowserAsync" method="post">
+                        <AntiforgeryToken />
+
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" ButtonType="ButtonType.Submit">Forget this browser</MudButton>
+                    </form>
+                }
+
+                <MudLink Href="Account/Manage/Disable2fa">Disable 2FA</MudLink>
+
+                <br />
+                <MudLink Href="Account/Manage/GenerateRecoveryCodes">Reset recovery codes</MudLink>
+            }
+
+            <MudText Typo="Typo.h6" GutterBottom="true">Authenticator app</MudText>
+
+            @if (!hasAuthenticator)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="EnableTwoFactorAuthentication">Add authenticator app</MudButton>
+                <br />
+            }
+            else
+            {
+                <MudLink Href="Account/Manage/EnableAuthenticator">Set up authenticator app</MudLink>
+
+                <br />
+                <MudLink Href="Account/Manage/ResetAuthenticator">Reset authenticator app</MudLink>
+            }
+        }
+        else
+        {
+            <MudAlert Variant="Variant.Text" Severity="Severity.Error">Privacy and cookie policy have not been accepted.</MudAlert>
+
+            <MudText Typo="Typo.body1" Class="pt-4">
+                You must accept the policy before you can enable two factor authentication.
+            </MudText>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    private bool is2faEnabled;
+    private bool isMachineRemembered;
+    private bool canTrack;
+    private bool hasAuthenticator;
+    private int recoveryCodesLeft;
+    private string? message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeTwoFactorAuth();
+    }
+
+    private async Task InitializeTwoFactorAuth()
+    {
+        var userResponse = await Http.GetFromJsonAsync<UserResponse>("api/Auth/user-info");
+        if (userResponse != null)
+        {
+            canTrack = true;
+            hasAuthenticator = userResponse.HasAuthenticator;
+            is2faEnabled = userResponse.Is2faEnabled;
+            isMachineRemembered = userResponse.IsMachineRemembered;
+            recoveryCodesLeft = userResponse.RecoveryCodesLeft;
+        }
+    }
+
+    private async Task EnableTwoFactorAuthentication()
+    {
+        var response = await Http.PostAsync("api/Auth/enable-2fa", null);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Enable2FAResponse>();
+            message = $"2FA enabled. Use this token to set up your authenticator app: {result?.Token}";
+            is2faEnabled = true;
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<Dictionary<string, string[]>>();
+            message = string.Join(", ", errorResponse?.SelectMany(e => e.Value) ?? new[] { "An error occurred." });
+        }
+    }
+
+    private async Task OnSubmitForgetBrowserAsync()
+    {
+        var response = await Http.PostAsync("api/Auth/forget-browser", null);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+            message = result?["Message"] ?? "The current browser has been forgotten.";
+            isMachineRemembered = false;
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+        else
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<Dictionary<string, string[]>>();
+            message = string.Join(", ", errorResponse?.SelectMany(e => e.Value) ?? new[] { "An error occurred." });
+        }
+    }
+
+    public class Enable2FAResponse
+    {
+        public string Token { get; set; } = string.Empty;
+    }
+
+    public class UserResponse
+    {
+        public bool CanTrack { get; set; }
+        public bool HasAuthenticator { get; set; }
+        public bool Is2faEnabled { get; set; }
+        public bool IsMachineRemembered { get; set; }
+        public int RecoveryCodesLeft { get; set; }
+    }
+}

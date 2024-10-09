@@ -16,21 +16,29 @@ using MudRoles.Infrastructure.Api;
 using MudExtensions.Services;
 using MudRoles.Infrastructure.MiddleWare;
 using MudRoles.Infrastructure.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.OpenApi.Models;
 
 /// <summary>
 /// Configures the web application builder, adds user secrets, and registers services.
 /// </summary>
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<CookiePolicyOptions>(opt =>
+{
+    opt.CheckConsentNeeded = context => true;
+    opt.MinimumSameSitePolicy = SameSiteMode.None;
+});
 // Add user secrets to the configuration
 builder.Configuration.AddUserSecrets<Program>();
 
 // Retrieve the API key from the configuration
-var movieApiKey = builder.Configuration["ApiKey"];
+//var movieApiKey = builder.Configuration["ApiKey"];
 
 // Register an HttpClient with a base address
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:7140") });
 
+builder.Services.AddHttpContextAccessor();
 /// <summary>
 /// Add MudBlazor services with extensions and options.
 /// </summary>
@@ -43,7 +51,8 @@ builder.Services.AddMudServicesWithExtensions(options =>
 builder.Services.AddMudExtensions();
 
 // Register the ThemeService
-builder.Services.AddScoped<ThemeService>();
+builder.Services.AddSingleton<ThemeService>();
+builder.Services.AddSingleton<ConsentService>();
 
 /// <summary>
 /// Add Razor components and interactive components for server and WebAssembly.
@@ -108,26 +117,62 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.AddValidatorsFromAssemblyContaining<KeyInputModelValidator>();
 
 // Add in-memory caching services
-builder.Services.AddMemoryCache();
+//builder.Services.AddMemoryCache();
 
 // Register the API key service
-builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+//builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "My API",
+        Description = "ASP.NET Core Web API"
+    });
+    // Custom schema ID generation to avoid conflicts
+    c.CustomSchemaIds(type => type.FullName);
+    // Add security definition for Identity
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        In = ParameterLocation.Header,
+        Description = "Enter your authentication token in the text input below.\r\n\r\nExample: \"12345abcdef\""
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseMigrationsEndPoint();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 
@@ -136,6 +181,7 @@ app.UseHttpsRedirection();
 /// </summary>
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.UseCookiePolicy();
 
 /// <summary>
 /// Map the controllers and configure Razor components with interactive render modes.
@@ -155,7 +201,6 @@ app.UseMudExtensions();
 /// Add additional endpoints required by the Identity /Account Razor components.
 /// </summary>
 app.MapAdditionalIdentityEndpoints();
-
 /// <summary>
 /// Initialize scope fetching for action descriptors.
 /// </summary>
@@ -165,8 +210,8 @@ ScopeFetcher.Initialize(actionDescriptorCollectionProvider);
 /// <summary>
 /// Use custom middleware for API key validation and rate limiting.
 /// </summary>
-app.UseMiddleware<ApiKeyMiddleware>();
-app.UseMiddleware<RateLimitingMiddleware>();
+//app.UseMiddleware<ApiKeyMiddleware>();
+//app.UseMiddleware<RateLimitingMiddleware>();
 
 // Seed the database with default roles and users 
 // Uncomment this code to seed the database with default roles and users

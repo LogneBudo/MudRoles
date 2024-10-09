@@ -15,12 +15,12 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
-
+@inject IJSRuntime JSRuntime
 <PageTitle>Register</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Gutters="false">
     <MudGrid Spacing="0">
-        <MudItem Class="rounded-l-xl d-flex flex-column object-contain align-center justify-center" xl="6" xxl="6" lg="6" md="0" sm="0" xs="0" Style="background: url('Register-Background.png') no-repeat center center / cover;">
+        <MudItem Class="rounded-l-xl d-flex flex-column object-contain align-center justify-center" xl="6" xxl="6" lg="6" md="0" sm="0" xs="0" Style="background: url('Register-Background.png') no-repeat center center; background-size: cover;">
             <MudText Color="Color.Primary" Typo="Typo.h3">CodeMoa</MudText>
             <MudText Color="Color.Secondary" Typo="Typo.h3">Registration</MudText>
         </MudItem>
@@ -47,12 +47,15 @@
                     </MudItem>
                     <MudGrid>
                         <MudItem md="12" sm="12" xs="12">
-                            <label for="@(() => Input.Title)">Choose a title:</label>
-                            <select id="mySelect" @onchange="HandleSelectChange">
-                                <option value="Mr">Mr</option>
-                                <option value="Mrs">Mrs</option>
-                                <option value="Dr">Dr</option>
-                            </select>
+                            <div class="materialize-select-wrapper">
+                                <label for="titleSelect">Choose a title:</label>
+                                <select id="@titleSelect" @bind="Input.Title">
+                                    <option value="" disabled selected>Choose your option</option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Dr">Dr</option>
+                                </select>
+                            </div>
                         </MudItem>
                         <MudItem md="12" sm="12" xs="12">
                             <MudStaticTextField For="@(() => Input.FirstName)" @bind-Value="Input.FirstName"
@@ -98,7 +101,7 @@
 </MudContainer>
 
 @code {
-
+    private string titleSelect = Guid.NewGuid().ToString();
     private IEnumerable<IdentityError>? identityErrors;
     private Title enumValue { get; set; } = Title.Mr;
 
@@ -107,8 +110,6 @@
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
-
-    private string? selectedTitle;
 
     [Parameter]
     public string? Value
@@ -124,13 +125,15 @@
         set;
     }
 
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
-
-    private void HandleSelectChange(ChangeEventArgs e)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        selectedTitle = e.Value?.ToString() ?? string.Empty;
-        Input.Title = selectedTitle;
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeMaterializeSelect");
+        }
     }
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
     private readonly List<string> avatars = new()
     {

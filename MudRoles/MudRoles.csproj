@@ -16,20 +16,30 @@
     <ProjectReference Include="..\MudRoles.Client\MudRoles.Client.csproj" />
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="7.0.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.*" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.*" />
     <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="2.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
     <PackageReference Include="MudBlazor.Extensions" Version="2.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
   </ItemGroup>
 
 
   <ItemGroup>
     <Folder Include="Migrations\ApiKeyDb\" />
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>

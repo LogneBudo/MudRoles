@@ -1,0 +1,553 @@
+﻿@page "/signup"
+@using FluentValidation
+@using MudBlazor.Extensions.Core
+@using MudBlazor.Utilities
+@using MudRoles.Client.Layout
+@using Newtonsoft.Json
+@using Nextended.Core.Extensions
+@using BlazorJS
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IDialogService DialogService
+<MudThemeProvider IsDarkMode="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme)" Theme="@ThemeService.CurrentTheme" />
+<PageTitle>Register</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Gutters="false">
+    <MudGrid Style="height: 990px!important" Spacing="0">
+        <MudItem Style="height: 990px!important" Class="@GetBackgroundClass()" xl="6" xxl="6" lg="6" md="0" sm="0" xs="0">
+            <MudText Style="@(GetStyleforHeadlineText)" Typo="Typo.h3">CodeMoa</MudText>
+            <MudText Style="@GetStyleforSubHeadlineText" Typo="Typo.h4">Registration</MudText>
+        </MudItem>
+        <MudItem Style="height:990px!important" lg="6" md="12" sm="12" xs="12">
+            <MudPaper Style="height:990px!important" Elevation="0" Class="pa-8 rounded-r-xl">
+                <MudStepperExtended @ref="_stepper" Class="mud-width-full" ContentStyle="min-height: 400px" Color="Color.Primary" Variant="Variant.Outlined"
+                                    Animation="true" ShowPreviousButton="true" ShowNextButton="true"
+                                    ShowSkipButton="false" ShowStepResultIndicator="true" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete"
+                                    HeaderTextView="HeaderTextView.OnlyActiveText" PreventStepChangeAsync="new Func<StepChangeDirection, int, Task<bool>>(CheckChange)"
+                                    IconActionButtons="false" Loading="_loading" HeaderSize="Size.Large"
+                                    StepperActionsJustify="StepperActionsJustify.SpaceBetween">
+                    <ChildContent>
+                        <MudItem md="12" sm="12" xs="12">
+                            <div class="d-flex justify-center">
+                                <MudIcon Icon="@(ThemeService.CurrentTheme == MudRolesTheme.DarkTheme ? CustomIcons.LogoDark : CustomIcons.LogoWhite)" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500" Style="width: 100px; height: 100px;" />
+                            </div>
+                        </MudItem>
+                        <MudStepExtended Icon="@Icons.Material.Filled.Approval" Title="Your details" StatusChanged="StatusChanged">
+                            <ChildContent>
+                                <EditForm @ref="_editForm" Model="Input" asp-route-returnUrl="@ReturnUrl" OnValidSubmit="RegisterUser" FormName="register">
+                                    <DataAnnotationsValidator />
+                                    <MudItem md="12" sm="12" xs="12">
+                                        <div class="d-flex justify-center">
+                                            <MudText Typo="Typo.h4">Register</MudText>
+                                        </div>
+                                    </MudItem>
+                                    <MudItem md="12" sm="12" xs="12">
+                                        <div class="d-flex justify-center">
+                                            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
+                                        </div>
+                                    </MudItem>
+                                    <MudGrid>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudSelect T="string" For="@(() => Input.Title)" @bind-Value="Input.Title" Label="Title" AnchorOrigin="Origin.BottomCenter" Placeholder="Select a title">
+                                                @foreach (Title title in Enum.GetValues(typeof(Title)))
+                                                {
+                                                    <MudSelectItem Value="@(title.ToString())">@title.ToString()</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.FirstName)" @bind-Value="Input.FirstName"
+                                                          Label="First name" Placeholder="Paul"
+                                                          UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.LastName)" @bind-Value="Input.LastName"
+                                                          Label="Last name" Placeholder="Simon"
+                                                          UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.Email)" @bind-Value="Input.Email"
+                                                          Label="Email" Placeholder="name@example.com"
+                                                          UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } } )" />
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.Password)" @bind-Value="Input.Password"
+                                                          Label="Password" InputType="InputType.Password" Placeholder="password"
+                                                          UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Typo="Typo.h6" For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
+                                                          Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
+                                                          UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
+                                        </MudItem>
+                                        <MudItem md="12" sm="12" xs="12">
+                                            
+                                        </MudItem>
+                                    </MudGrid>
+                                </EditForm>
+                            </ChildContent>
+                        </MudStepExtended>
+                        <MudStepExtended Title="Preferences" Icon="@Icons.Material.Filled.MoreVert" Optional="true">
+                            <ChildContent>
+                                <MudItem Class="mx-6 mb-5" md="12" sm="12" xs="12">
+                                    <MudText Class="mud-typography mud-typography-body1 mud-input-label pt-3 --mud-palette-text-secondary">Pick the theme mode</MudText>
+                                    <MudSwitch Color="Color.Dark" UncheckedColor="Color.Primary" For="@(() => Input.IsDarkTheme)" @bind-Value="ThemeChoice" Label="Dark Theme" />
+                                </MudItem>
+                                <MudItem md="12" sm="12" xs="12">
+                                    <MudStack Class="mx-5 mb-7">
+                                        <MudText>Choose your type of Avatar</MudText>
+                                        <MudToggleGroup T="string" SelectionMode="SelectionMode.SingleSelection" @bind-Value="_choiceAvatar" Color="Color.Primary" CheckMark FixedContent>
+                                            <MudToggleItem Value="@("Avataralone")" Text="Avatar alone" />
+                                            <MudToggleItem Value="@("IconAvatar")" Text="Icon Avatar" />
+                                            <MudToggleItem Value="@("YourphotoAvatar")" Text="Your photo Avatar" />
+                                        </MudToggleGroup>
+                                    </MudStack>
+                                </MudItem>
+                                @if (_choiceAvatar == string.Empty)
+                                {
+                                    <MudItem Style="height:426px!important" md="12" sm="12" xs="12" Class="d-flex mt-5 justify-center">
+                                    </MudItem>
+                                }
+                                @if (_choiceAvatar == AvatarChoice.IconAvatar.ToString())
+                                {
+                                    <MudItem Style="height:426px!important" md="12" sm="12" xs="12" Class="d-flex mt-5 pt-7 justify-center">
+                                        <MudAvatar Variant="Variant.Outlined" Style="@avatarStyle">
+                                            @if (string.IsNullOrEmpty(Source))
+                                            {
+                                                <span style="color:white">A</span>
+                                            }
+                                            else
+                                            {
+                                                <MudImage Src="@Source" />
+                                            }
+                                        </MudAvatar>
+                                        <MudExColorBubble @bind-Color="@MyColor" t CloseAfterSelect="true" ShowColorPreview="true" @ref="component"></MudExColorBubble>
+                                    </MudItem>
+                                }
+                                else if (_choiceAvatar == @AvatarChoice.Avataralone.ToString())
+                                {
+                                    <MudItem Style="height:450px!important" xs="12">
+                                        <AvatarSelection Label="Pick an avatar" TItem="string" Items="@avatarItems" @bind-SelectedItem="selectedAvatar" />
+                                    </MudItem>
+                                }
+                                else if (_choiceAvatar == @AvatarChoice.YourphotoAvatar.ToString())
+                                {
+                                    <MudItem Style="height:426px!important" md="12" sm="12" xs="12">
+                                        <MudForm Model="@model" @ref="@form" Validation="@(ValidationRules.ValidateValue)" ValidationDelay="0">
+                                            <MudCardContent>
+                                                <MudTextField @bind-Value="model.Name" For="@(() => model.Name)" HelperText="Set another name to your file if you wish..." Immediate="true" Label="Name" />
+                                                <MudExUploadEdit T="UploadableFile"
+                                                                 AllowFolderUpload="false"
+                                                                 Variant="Variant.Outlined"
+                                                                 For="@(() => model.Files)"
+                                                                 TextUploadFile="Click here to upload files"
+                                                                 TextDropZone="Drag and Drop files here"
+                                                                 Label="Add your own photo"
+                                                                 ColorizeIcons="true"
+                                                                 MinHeight="80"
+                                                                 Class="MudExUploadExCustom"
+                                                                 AllowRename="true"
+                                                                 TextUploadFiles="Upload Photo Avatar"
+                                                                 @bind-UploadRequests="model.Files">
+                                                </MudExUploadEdit>
+                                            </MudCardContent>
+                                            <MudCardActions>
+                                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Submit</MudButton>
+                                            </MudCardActions>
+                                        </MudForm>
+                                    </MudItem>
+                                }
+                            </ChildContent>
+                        </MudStepExtended>
+                        @if (_addResultStep)
+                        {
+                            <MudStepExtended Icon="@Icons.Material.Filled.Alarm" Title="Result Step" IsResultStep="true">
+                                <ChildContent>
+                                    <MudItem>
+                                        <MudPaper Class="pa-6" Elevation="3" Style="width:100%" >
+                                            <MudText Typo="Typo.h4">Registration Details</MudText>
+                                            <br /> <br />
+                                            <MudText HtmlTag="strong">Personal Details</MudText>
+                                            <MudText HtmlTag="p" Typo="Typo.body1"><b>Title: </b>@(this.Input.Title)</MudText>
+                                            <MudText HtmlTag="p" Typo="Typo.body1"><b>First name: </b>@(this.Input.FirstName)</MudText>
+                                            <MudText HtmlTag="p" Typo="Typo.body1"><b>Last name: </b>@(this.Input.LastName)</MudText>
+                                            <MudText HtmlTag="p" Typo="Typo.body1"><b>Email: </b>@(this.Input.Email)</MudText>
+
+                                            <br />
+                                            <MudText HtmlTag="strong">Profile Preferences</MudText>
+                                            <br />
+                                        <MudText HtmlTag="p" Typo="Typo.body1"><b>DarkMode: </b>@(this.Input.IsDarkTheme.ToString())</MudText>
+                                            <MudText HtmlTag="p" Typo="Typo.body1"><b>Avatar choice: </b>@(this._choiceAvatar) and @(this.selectedAvatar)</MudText>
+                                        </MudPaper>
+                                    </MudItem>
+                                    <div class="d-flex flex-column align-center justify-center" style="height:426px!important">
+                                        <MudIconButton Icon="@Icons.Material.Filled.DoneAll" Size="Size.Large" Variant="Variant.Filled" Color="Color.Success" />
+                                        <MudText>Your reservation successfully completed.</MudText>
+                                    </div>
+                                </ChildContent>
+                            </MudStepExtended>
+                        }
+                    </ChildContent>
+                    <ActionContent>
+                        @if (_stepper != null && !_stepper.IsAllStepsCompleted() && _showCustomButton)
+                        {
+                            <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="@(() => Snackbar.Add("Custom cancel button clicked.", MudBlazor.Severity.Info))">Cancel</MudButton>
+                        }
+                    </ActionContent>
+                </MudStepperExtended>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+<style>
+    .loginbg {
+        background: url("day2.jpg") no-repeat center center / cover;
+        box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);
+    }
+
+    .loginbg-night {
+        background: url("night.jpg") no-repeat center center / cover;
+        box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);
+    }
+</style>
+@code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new InputModel
+        {
+            FirstName = "John",
+            LastName = "Paul",
+            Email = "jp@email.com",
+            Password = "Zorro@777",
+            ConfirmPassword = "Zorro@777",
+            Title = Title.Mr.ToString()
+        };
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+    private MudColor _color = new("#333");
+    private string _choiceAvatar = "";
+    private List<AvatarItem<string>> avatarItems = new()
+    {
+        new AvatarItem<string> { ImageUrl = "avatar1.png", Value = "avatar1" },
+        new AvatarItem<string> { ImageUrl = "avatar2.png", Value = "avatar2" },
+        new AvatarItem<string> { ImageUrl = "avatar3.png", Value = "avatar3" },
+        new AvatarItem<string> { ImageUrl = "avatar4.png", Value = "avatar4" },
+        new AvatarItem<string> { ImageUrl = "avatar5.png", Value = "avatar5" }
+    };
+    private bool _isDarkTheme = false;
+    public bool ThemeChoice 
+    {
+        get => _isDarkTheme;
+        set
+        {
+            if (_isDarkTheme != value)
+            {
+                _isDarkTheme = value;
+                Input.IsDarkTheme = value;
+                ThemeService.ToggleDarkMode();
+                StateHasChanged();
+            }
+        }
+    }
+    private string selectedAvatar = "";
+    private string _source = "";
+    private string? Source
+    {
+        get => _source;
+        set
+        {
+            if (_source != value)
+            {
+                _source = value ?? "";
+                StateHasChanged();
+            }
+
+        }
+    }
+    private MudColor MyColor
+    {
+        get => _color;
+        set
+        {
+            if (_color != value)
+            {
+                _color = value;
+                avatarStyle = $"height:70px; width:70px; font-size:2rem; background-color:{_color.ToString()};";
+                StateHasChanged();
+            }
+        }
+    }
+    MudExColorBubble component = default!;
+    private Title enumValue { get; set; } = Title.Mr;
+    private string? errorMessage = "";
+    MudStepperExtended? _stepper = new();
+    bool _addResultStep = true;
+    bool _loading;
+    MudForm? _form = new();
+    MudForm? _form2 = new();
+    bool _checkValidationBeforeComplete = true;
+    bool _showCustomButton = false;
+    private EditForm? _editForm;
+    private string avatarStyle = string.Empty;
+    private MudForm form = default!;
+    private FileModel model = new();
+    private FileModelFluentValidator ValidationRules = new();
+    private string GetStyleforHeadlineText = "";
+    private string GetStyleforSubHeadlineText = "";
+    protected async override Task OnInitializedAsync()
+    {
+        GetStyleforHeadlineText = $"color:{ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme)};font-weight:600;";
+        GetStyleforSubHeadlineText = $"color:{ThemeService.GetSecondaryColorHex(ThemeService.CurrentTheme)};font-weight:600;";
+        _color = ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme);
+        avatarStyle = $"height:70px; width:70px; font-size:2rem; background-color:{ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme)};";
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+        await base.OnInitializedAsync();
+    }
+    private async Task HandleThemeChanged()
+    {
+        GetStyleforHeadlineText = $"color:{ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme)};font-weight:600";
+        GetStyleforSubHeadlineText = $"color:{ThemeService.GetSecondaryColorHex(ThemeService.CurrentTheme)};font-weight:600";
+        avatarStyle = $"height:70px; width:70px; font-size:2rem; background-color:{ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme)};";
+        _color = ThemeService.GetPrimaryColorHex(ThemeService.CurrentTheme);
+        await InvokeAsync(StateHasChanged);
+
+    }
+    private string GetBackgroundClass()
+    {
+        string newClass = "";
+        newClass = ThemeService.CurrentTheme == MudRolesTheme.DarkTheme ? "loginbg-night rounded-l-xl d-flex flex-column object-contain align-center justify-space-evenly" : "loginbg rounded-l-xl d-flex flex-column object-contain align-center justify-space-evenly";
+        return newClass;
+    }
+    public async Task RegisterUser(EditContext editContext)
+    {
+        if (editContext != null)
+        {
+            var isValid = editContext.Validate();
+            if (isValid)
+            {
+                switch (_choiceAvatar)
+                {
+                    case "Avataralone":
+                        Input.AvatarChoice = AvatarChoice.Avataralone.ToString();
+                        Input.AvatarId = selectedAvatar;
+                        break;
+                    case "IconAvatar":
+                        Input.AvatarChoice = AvatarChoice.IconAvatar.ToString();
+                        Input.AvatarColor = MyColor.ToString();
+
+                        break;
+                    case "YourphotoAvatar":
+                        Input.AvatarChoice = AvatarChoice.YourphotoAvatar.ToString();
+                        var file = model.Files[0];
+                        Input.AvatarPhoto = file.Data;
+                        break;
+                    default:
+                        Input.AvatarChoice = "";
+                        break;
+                }
+                var signUpData = new InputModel
+                    {
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        Title = Input.Title,
+                        IsDarkTheme = Input.IsDarkTheme,
+                        Email = Input.Email,
+                        Password = Input.Password,
+                        ConfirmPassword = Input.ConfirmPassword,
+                        AvatarId = Input.AvatarId,
+                        AvatarChoice = Input.AvatarChoice,
+                        AvatarColor = MyColor.ToString(),
+                        AvatarPhoto = Input.AvatarPhoto
+                    };
+
+                // Perform registration logic here
+                var response = await HttpClient.PostAsJsonAsync("api/auth/signup", signUpData);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+                    if (result != null)
+                    {
+                        Snackbar.Add("Registration successful. Please check your email to confirm your account.", MudBlazor.Severity.Success);
+
+                        if (result.RequireConfirmedAccount)
+                        {
+                            var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                                NavigationManager.ToAbsoluteUri("/ActivateAccount").AbsoluteUri,
+                                new Dictionary<string, object?> { ["userId"] = result.UserId, ["code"] = result.Code, ["returnUrl"] = ReturnUrl });
+
+                            var emailSentResponse = await HttpClient.PostAsJsonAsync("api/auth/sendconflink", new { Email = Input.Email, CallbackUrl = callbackUrl });
+                            if (emailSentResponse.IsSuccessStatusCode)
+                            {
+                                Snackbar.Add("Confirmation link sent. Please check your email.", MudBlazor.Severity.Info);
+                            }
+                            //await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+                            NavigationManager.NavigateTo($"SignupConfirmation?email={Input.Email}");
+                        }
+                        else
+                        {
+                            NavigationManager.NavigateTo(ReturnUrl ?? "/");
+                        }
+                    }
+                    
+                    
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+                }
+            }
+            else
+            {
+                Snackbar.Add(errorMessage, MudBlazor.Severity.Error);
+            }
+        }
+    }
+    private void StatusChanged(StepStatus status)
+    {
+        Snackbar.Add($"First step {status.ToDescriptionString()}.", MudBlazor.Severity.Info);
+    }
+    private async Task<bool> CheckChange(StepChangeDirection direction, int targetIndex)
+    {
+        if (_checkValidationBeforeComplete == true)
+        {
+            // Always allow stepping backwards, even if forms are invalid
+            if (direction == StepChangeDirection.Backward)
+            {
+                return false;
+            }
+            if (_stepper?.GetActiveIndex() == 0)
+            {
+                _loading = true;
+                StateHasChanged();
+                await Task.Delay(1000);
+                var isValid = _editForm?.EditContext?.Validate() ?? false;
+                _loading = false;
+                StateHasChanged();
+                return !isValid;
+            }
+            else if (_stepper?.GetActiveIndex() == 1)
+            {
+                _loading = true;
+                StateHasChanged();
+                await Task.Delay(1000);
+
+                if (_choiceAvatar == string.Empty)
+                {
+                    _loading = false;
+                    StateHasChanged();
+                    return false;
+                }
+                else
+                {
+                    if (_editForm != null && _editForm.EditContext != null)
+                    {
+                        await RegisterUser(_editForm.EditContext); // Call the registerUser task
+                        _loading = false;
+                        StateHasChanged();
+                        return true;
+                    }
+                    _loading = false;
+                    StateHasChanged();
+                    return false; // Allow step change
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private async Task Submit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            // Check if there are any files uploaded
+            if (form.Model is FileModel fileModel && fileModel.Files.Any())
+            {
+                var file = fileModel.Files[0];
+                Source = $"data:image/png;base64,{Convert.ToBase64String(file.Data)}";
+                if (_choiceAvatar == "")
+                {
+                    
+                }
+                // TODO: Persist the uploaded photo to the database
+                var content = new MultipartFormDataContent();
+                var fileContent = new ByteArrayContent(file.Data);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+                content.Add(fileContent, "file", file.FileName);
+
+                //var response = await HttpClient.PostAsync("api/Upload", content);
+                // if (response.IsSuccessStatusCode)
+                // {
+                //     Snackbar.Add("File uploaded successfully.", MudBlazor.Severity.Success);
+                // }
+                // else
+                // {
+                //     Snackbar.Add("File upload failed. Please try again.", MudBlazor.Severity.Error);
+                // }
+            }
+            // else
+            // {
+            //     Snackbar.Add("No file selected. Please upload a file.", MudBlazor.Severity.Warning);
+            // }
+        }
+        else
+        {
+            Snackbar.Add("Form is not valid. Please correct the errors and try again.", MudBlazor.Severity.Error);
+        }
+    }
+    public class FileModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public IBrowserFile File { get; set; } = default!;
+        public IList<UploadableFile> Files { get; set; } = new List<UploadableFile>();
+    }
+    public enum AvatarChoice
+    {
+        Avataralone,
+        IconAvatar,
+        YourphotoAvatar
+    }
+    /// <summary>
+    /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
+    /// </summary>
+    /// <typeparam name="OrderModel"></typeparam>
+    public class FileModelFluentValidator : AbstractValidator<FileModel>
+    {
+        public FileModelFluentValidator()
+        {
+            RuleFor(x => x.Name)
+            .NotEmpty()
+            .Length(1, 100);
+            RuleFor(x => x.File)
+            .NotEmpty();
+            RuleFor(x => x.Files)
+            .NotEmpty();
+            When(x => x.File != null, () =>
+            {
+                RuleFor(x => x.File.Size).LessThanOrEqualTo(10485760).WithMessage("The maximum file size is 10 MB");
+            });
+        }
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<FileModel>.CreateWithOptions((FileModel)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+    private class RegisterResponse
+    {
+        public string? UserId { get; set; }
+        public string? Code { get; set; }
+        public bool RequireConfirmedAccount { get; set; }
+    }
+}

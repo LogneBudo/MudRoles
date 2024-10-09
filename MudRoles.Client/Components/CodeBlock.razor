@@ -1,39 +1,30 @@
-﻿@using MudBlazor
-@inject IJSRuntime JS
+﻿
 
 <MudPaper Elevation="2" Class="p-4">
-    <div class="code-block">
-        <pre class="code"><code class="@Language" data-language="@Language">
-                @ChildContent
-        </code></pre>
-    </div>
+    <MudText Typo="Typo.body1"></MudText>
 </MudPaper>
-<style>
-    .hljs {
-        background: #2d2b57; /* Set your desired background color */
-        padding: 0.5em;
-    }
-
-    .hljs-comment {
-        color: green; /* Set your desired green color */
-    }
-</style>
 
 @code {
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+  
+
+    
+    // private StandaloneCodeEditor? editor;
 
     [Parameter]
-    public string Language { get; set; } = "csharp";
+    public string CodeValue { get; set; } = string.Empty;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (!string.IsNullOrEmpty(Language))
-            {
-                await JS.InvokeVoidAsync("highlightSnippet");
-            }
-        }
-    }
+    // [Parameter]
+    // public string Id { get; set; } = Guid.NewGuid().ToString(); // Ensure unique ID
+
+    [Parameter]
+    public string Language { get; set; } = "c#";
+    // private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    // {
+    //     return new StandaloneEditorConstructionOptions
+    //         {
+    //             AutomaticLayout = true,
+    //             Language = Language,
+    //             Value = CodeValue
+    //         };
+    // }
 }

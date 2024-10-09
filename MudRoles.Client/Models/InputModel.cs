@@ -20,6 +20,12 @@ namespace MudRoles.Client.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
 
+        [Display(Name = "Your choice of Avatar")]
+        public string AvatarChoice { get; set; } = "";
+
+        [Display(Name = "Set the color of the Avatar")]
+        public string AvatarColor { get; set; } = "";
+
         [Required]
         [Display(Name = "First Name")]
         public string FirstName { get; set; } = "";
@@ -36,5 +42,7 @@ namespace MudRoles.Client.Models
 
         [Display(Name = "Avatar")]
         public string AvatarId { get; set; } = "";
+        public string AvatarUrl { get; set; } = "";
+        public byte[]? AvatarPhoto { get; set; }
     }
 }
